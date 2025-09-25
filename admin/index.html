@@ -6,27 +6,46 @@
   <title>SolarForever Admin Panel</title>
   <link rel="stylesheet" href="../css/styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="admin.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
-  <header class="bg-blue-900 text-white py-4 px-6 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">SolarForever Admin</h1>
-    <span class="text-sm">Quality Check Dashboard</span>
-  </header>
-  <main class="container mx-auto px-4 py-8">
-    <section class="mb-8">
-      <h2 class="text-xl font-semibold mb-4">Pending Product Verifications</h2>
-      <div class="bg-white rounded-lg shadow p-4">
-        <p class="text-gray-600">No pending products for verification.</p>
-        <!-- Later: Table/list of products to verify -->
+  <div id="admin-login-section" class="min-h-screen flex items-center justify-center">
+    <form id="admin-login-form" class="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
+      <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Admin Login</h2>
+      <div class="mb-4">
+        <label for="admin-username" class="block text-gray-700 font-semibold mb-2">Username</label>
+        <input id="admin-username" name="username" type="text" placeholder="adminuser" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
       </div>
-    </section>
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Recently Verified Products</h2>
-      <div class="bg-white rounded-lg shadow p-4">
-        <p class="text-gray-600">No recently verified products.</p>
-        <!-- Later: Table/list of verified products -->
+      <div class="mb-4">
+        <label for="admin-password" class="block text-gray-700 font-semibold mb-2">Password</label>
+        <input id="admin-password" name="password" type="password" placeholder="solar@2025" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
       </div>
-    </section>
-  </main>
+      <div id="admin-login-error" class="text-red-600 text-sm mb-4 hidden">Incorrect username or password.</div>
+      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors">Login</button>
+    </form>
+  </div>
+
+  <div id="admin-dashboard-section" class="hidden">
+    <header class="bg-blue-900 text-white py-4 px-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">SolarForever Admin</h1>
+      <span class="text-sm">Quality Check Dashboard</span>
+    </header>
+    <main class="container mx-auto px-4 py-8">
+      <section class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Pending Product Verifications</h2>
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600">No pending products for verification.</p>
+          <!-- Later: Table/list of products to verify -->
+        </div>
+      </section>
+      <section>
+        <h2 class="text-xl font-semibold mb-4">Recently Verified Products</h2>
+        <div class="bg-white rounded-lg shadow p-4">
+          <p class="text-gray-600">No recently verified products.</p>
+          <!-- Later: Table/list of verified products -->
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
