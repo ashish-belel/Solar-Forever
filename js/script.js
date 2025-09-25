@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Show query modal on "I am Interested" button click
+  // Show query modal on "I am Interested" button click, hide product details modal
   document.addEventListener('click', function (e) {
     if (e.target && e.target.id === 'interested-btn') {
       const queryModal = document.getElementById('interestedQueryModal');
