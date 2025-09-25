@@ -1,0 +1,86 @@
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.hero-overlay {
+  background-color: rgba(0, 25, 50, 0.7);
+}
+
+.section-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.section-subtitle {
+  font-size: 1.125rem;
+  color: #4b5563;
+}
+
+.nav-link {
+  position: relative;
+  transition: color 0.3s;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f59e0b;
+  transition: width 0.3s;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 90%;
+  max-width: 500px;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-backdrop.active .modal-content {
+  transform: scale(1);
+}
+
+.tab-btn.active {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+/* Style for the new active product tab */
+.product-tab-btn.active {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
