@@ -164,8 +164,22 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('modal-product-wattage').textContent = wattage ? wattage[0] : 'N/A';
       document.getElementById('modal-product-age').textContent = age ? age[0] : 'N/A';
 
+      // Hide query message if previously shown
+      const queryMsg = document.getElementById('interested-query-message');
+      if (queryMsg) queryMsg.classList.add('hidden');
+
       showModal(productDetailModal);
     });
+  });
+
+  // Show query modal on "I am Interested" button click
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'interested-btn') {
+      const queryModal = document.getElementById('interestedQueryModal');
+      const productDetailModal = document.getElementById('productDetailModal');
+      if (productDetailModal) productDetailModal.classList.remove('active');
+      if (queryModal) queryModal.classList.add('active');
+    }
   });
   // === END OF UPDATED LOGIC ===
 
