@@ -378,52 +378,41 @@
     </div>
   </div>
   <div id="authModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="flex border-b mb-6">
-        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign In</button>
-        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
-      </div>
-      <form id="login-form" class="space-y-4">
-        <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
-        <div>
-          <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-          <input type="tel" id="login-phone"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <div>
-          <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="login-password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <button type="submit"
-          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Sign In</button>
-      </form>
-      <form id="signup-form" class="space-y-4 hidden">
-        <h3 class="text-xl font-bold text-center">Create a New Account</h3>
-        <div>
-          <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-          <input type="tel" id="signup-phone"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <div>
-          <label for="signup-otp" class="block text-sm font-medium text-gray-700">Verification OTP</label>
-          <input type="text" id="signup-otp"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <div>
-          <label for="signup-password" class="block text-sm font-medium text-gray-700">Set Password</label>
-          <input type="password" id="signup-password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <div>
-          <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-          <input type="password" id="signup-confirm-password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-        </div>
-        <button type="submit"
-          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Sign Up</button>
-      </form>
+  <div class="modal-content">
+    <div class="flex border-b mb-6">
+      <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">Sign In</button>
+      <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
     </div>
+
+    <form id="login-form" class="space-y-4" novalidate>
+      <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
+      <div>
+        <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+        <input type="tel" id="login-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <div id="recaptcha-container-login"></div>
+      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
+    </form>
+
+    <form id="signup-form" class="space-y-4 hidden" novalidate>
+      <h3 class="text-xl font-bold text-center">Create a New Account</h3>
+      <div>
+        <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" id="signup-name" placeholder="Enter your full name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <div>
+        <label for="signup-address" class="block text-sm font-medium text-gray-700">Address</label>
+        <input type="text" id="signup-address" placeholder="Enter your address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <div>
+        <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+        <input type="tel" id="signup-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+      </div>
+      <div id="recaptcha-container-signup"></div>
+      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign Up</button>
+    </form>
+  </div>
+</div>
   </div>
   <div id="sellPanelModal" class="modal-backdrop">
     <div class="modal-content">
@@ -529,7 +518,9 @@
       </div>
     </div>
   </div>
-
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
   <script src="js/script.js"></script>
 </body>
