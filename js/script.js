@@ -589,3 +589,44 @@ function setupRecaptcha(containerId) {
 
     document.getElementById('year').textContent = new Date().getFullYear();
 });
+
+async function getNewestSellQueries(numberOfQueries) {
+  try {
+    console.log("Fetching the", numberOfQueries, "newest sell queries...");
+
+    // 1. Reference the 'sellQueries' collection in your database
+    const queryCollection = db.collection("sellQueries");
+
+    // 2. Create the query
+    const query = queryCollection
+      .orderBy("submittedAt", "desc") // Order by the timestamp, newest first
+      .limit(numberOfQueries);        // Get only the number of queries you want
+
+    // 3. Execute the query
+    const querySnapshot = await query.get();
+
+    // 4. Process and display the results
+    if (querySnapshot.empty) {
+      console.log("No sell queries found.");
+      return;
+    }
+
+    console.log("Here are the newest queries:");
+    querySnapshot.forEach((doc) => {
+      // doc.id is the unique ID of the query
+      // doc.data() is the object with all the form data (panelParams, sellerPhone, etc.)
+      console.log(`ID: ${doc.id}`, doc.data());
+    });
+
+  } catch (error) {
+    console.error("Error getting new queries: ", error);
+  }
+}
+
+// --- HOW TO USE IT ---
+// You can call this function anytime you want to see the latest data.
+// For example, to get the 5 newest queries:
+getNewestSellQueries(5);
+
+// To get the 10 newest queries:
+// getNewestSellQueries(10);
