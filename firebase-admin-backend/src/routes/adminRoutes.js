@@ -1,14 +1,13 @@
 const express = require('express');
-const router = express.Router();
-const authenticateAdmin = require('../middleware/authMiddleware');
 const adminController = require('../controllers/adminController');
+const authenticateAdmin = require('../middleware/authMiddleware');
 
-router.get('/users', adminController.getUsers);
-router.post('/users', adminController.createUser);
-// Protect all admin routes
+const router = express.Router();
+
 router.use(authenticateAdmin);
 
 router.post('/panels/:panelId/approve', adminController.approvePanel);
-// ...other secured routes
-
+// Add other protected routes here
+router.get('/users', adminController.getUsers);
+router.post('/users', adminController.createUser);
 module.exports = router;

@@ -1,14 +1,14 @@
 // src/config/firebase.js
 const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const serviceAccount = require('./serviceAccountKey.json'); // Download this from Firebase console
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');
 
-initializeApp({
-  credential: cert(serviceAccount),
-  databaseURL: "https://<solar-forever>.firebaseio.com"
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://solar-forever-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
-const db = getFirestore();
+const db = admin.firestore();
 
 module.exports = db;
-// Replace <YOUR_PROJECT_ID> with your actual Firebase project ID
