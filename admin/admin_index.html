@@ -10,236 +10,17 @@
   <style>
     /* Custom styles for modal transitions */
     .modal {
-        transition: opacity 0.3s ease, visibility 0.3s ease;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    .modal-content {
-        transition: transform 0.3s ease;
-    }
-    .modal.hidden {
-        opacity: 0;
-        visibility: hidden;
-    }
-    .modal.hidden .modal-content {
-        transform: scale(0.95);
-    }
-    /* SVG Circle Chart Animation */
-    .circle-chart-progress {
-        transition: stroke-dashoffset 0.5s ease-in-out;
-    }
-  </style>
-</head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
-
-  <div id="admin-login-section" class="min-h-screen flex items-center justify-center bg-gray-50">
-    <form id="admin-login-form" class="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
-      <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Admin Login</h2>
-      <div class="mb-4">
-        <!-- Replaced username input with phone number input -->
-        <label for="admin-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-        <input id="admin-phone" name="phone" type="tel" placeholder="+91XXXXXXXXXX"
-          class="w-full px-3 py-2 border border-gray-300 rounded" required>
-      </div>
-      <div class="mb-4">
-        <label for="admin-password" class="block text-gray-700 font-semibold mb-2">Password</label>
-        <input id="admin-password" name="password" type="password" placeholder="solar@2025" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
-      </div>
-      <div id="admin-login-error" class="text-red-600 text-sm mb-4 hidden">Incorrect username or password.</div>
-      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors">Login</button>
-    </form>
-  </div>
-
-
-  <div id="admin-dashboard-section" class="hidden">
-    <header class="bg-blue-900 text-white py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-40">
-      <div class="flex items-center space-x-2">
-        <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.181-3.183m-4.991-2.691L7.5 7.5l-2.689 2.691M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <h1 class="text-2xl font-bold">SolarForever Admin</h1>
-      </div>
-      <span class="text-sm">Quality Check & Marketplace Dashboard</span>
-    </header>
-    
-    <main class="container mx-auto px-6 py-8">
-
-      <section id="metrics" class="mb-10">
-        <h2 class="text-2xl font-semibold mb-6 text-gray-700">Website Health & Metrics</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-                <div class="relative w-32 h-32">
-                    <svg class="w-full h-full" viewBox="0 0 36 36">
-                        <path class="text-gray-200" stroke-width="3" fill="none" stroke="currentColor" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-blue-600 circle-chart-progress" stroke-width="3" fill="none" stroke-linecap="round" stroke="currentColor" stroke-dasharray="60, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-blue-900">60%</div>
-                </div>
-                <h3 class="mt-4 font-semibold text-gray-600">Server Load</h3>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-                <div class="relative w-32 h-32">
-                    <svg class="w-full h-full" viewBox="0 0 36 36">
-                        <path class="text-gray-200" stroke-width="3" fill="none" stroke="currentColor" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-blue-600 circle-chart-progress" stroke-width="3" fill="none" stroke-linecap="round" stroke="currentColor" stroke-dasharray="45, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-blue-900">45%</div>
-                </div>
-                <h3 class="mt-4 font-semibold text-gray-600">Database Capacity</h3>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-                <div class="relative w-32 h-32">
-                    <svg class="w-full h-full" viewBox="0 0 36 36">
-                        <path class="text-gray-200" stroke-width="3" fill="none" stroke="currentColor" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-blue-600 circle-chart-progress" stroke-width="3" fill="none" stroke-linecap="round" stroke="currentColor" stroke-dasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-xl font-bold text-blue-900">8.5k</span>
-                        <span class="text-xs text-gray-500">Visits</span>
-                     </div>
-                </div>
-                <h3 class="mt-4 font-semibold text-gray-600">Daily Traffic</h3>
-            </div>
-             <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
-                <div class="relative w-32 h-32">
-                    <svg class="w-full h-full" viewBox="0 0 36 36">
-                        <path class="text-gray-200" stroke-width="3" fill="none" stroke="currentColor" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="text-blue-600 circle-chart-progress" stroke-width="3" fill="none" stroke-linecap="round" stroke="currentColor" stroke-dasharray="70, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="text-xl font-bold text-blue-900">7k</span>
-                        <span class="text-xs text-gray-500">Users</span>
-                     </div>
-                </div>
-                <h3 class="mt-4 font-semibold text-gray-600">Monthly Active Users</h3>
-            </div>
-        </div>
-      </section>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <section id="seller-queries">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Pending Seller Verifications</h2>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b">
-                <tr>
-                  <th class="p-4 font-semibold">Seller</th>
-                  <th class="p-4 font-semibold">Panel Type</th>
-                  <th class="p-4 font-semibold">Date</th>
-                  <th class="p-4 font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b">
-                  <td class="p-4">Arjun Sharma</td>
-                  <td class="p-4">380W Bifacial</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
-                  <td class="p-4"><button data-modal-target="sellerQueryModal1" class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View Details</button></td>
-                </tr>
-                <tr class="border-b">
-                  <td class="p-4">Priya Patel</td>
-                  <td class="p-4">350W Monocrystalline</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-24</td>
-                  <td class="p-4"><button data-modal-target="sellerQueryModal1" class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View Details</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="buyer-queries">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Buyer Inquiries</h2>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b">
-                <tr>
-                  <th class="p-4 font-semibold">Buyer</th>
-                  <th class="p-4 font-semibold">Inquiry Type</th>
-                  <th class="p-4 font-semibold">Date</th>
-                  <th class="p-4 font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b">
-                  <td class="p-4">Rohan Mehta</td>
-                  <td class="p-4">General Requirement</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-26</td>
-                  <td class="p-4"><button data-modal-target="buyerQueryModal1" class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button></td>
-                </tr>
-                <tr class="border-b">
-                  <td class="p-4">Sunita Singh</td>
-                  <td class="p-4">Specific Panel Interest</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
-                  <td class="p-4"><button data-modal-target="buyerQueryModal2" class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <section id="marketplace-management">
-      <h2 class="text-2xl font-semibold mb-6 text-gray-700">Marketplace Management</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <!-- Panel 1 -->
-        <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
-          <img src="https://images.pexels.com/photos/159397/solar-panel-array-power-sun-electricity-159397.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="w-full h-48 object-cover" alt="Solar Panel">
-          <div class="p-4 flex-1 flex flex-col">
-            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
-            <h3 class="font-bold mt-2 text-lg text-gray-800">350W Monocrystalline Panel</h3>
-            <p class="text-gray-600 text-sm">Condition: Excellent (2 years old)</p>
-            <p class="text-blue-700 font-bold text-xl mt-2">$120.00</p>
-            <div class="mt-4 flex-1 flex items-end">
-            <button data-modal-target="marketplacePanelModal1" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- Panel 2 -->
-        <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
-          <img src="https://images.pexels.com/photos/4148960/pexels-photo-4148960.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="w-full h-48 object-cover" alt="Solar Panel">
-          <div class="p-4 flex-1 flex flex-col">
-            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
-            <h3 class="font-bold mt-2 text-lg text-gray-800">400W Polycrystalline Panel</h3>
-            <p class="text-gray-600 text-sm">Condition: Good (4 years old)</p>
-            <p class="text-blue-700 font-bold text-xl mt-2">$95.00</p>
-            <div class="mt-4 flex-1 flex items-end">
-            <button data-modal-target="marketplacePanelModal2" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- Panel 3 -->
-        <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
-          <img src="https://images.pexels.com/photos/356073/pexels-photo-356073.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="w-full h-48 object-cover" alt="Solar Panel">
-          <div class="p-4 flex-1 flex flex-col">
-            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
-            <h3 class="font-bold mt-2 text-lg text-gray-800">320W Flexible Panel</h3>
-            <p class="text-gray-600 text-sm">Condition: Excellent (3 years old)</p>
-            <p class="text-blue-700 font-bold text-xl mt-2">$110.00</p>
-            <div class="mt-4 flex-1 flex items-end">
-            <button data-modal-target="marketplacePanelModal3" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- Panel 4 -->
-              <div class="bg-white rounded-lg overflow-hidden shadow-md border" style="opacity:0.65;" flex flex-col>
-          <img src="https://images.pexels.com/photos/2873951/pexels-photo-2873951.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="w-full h-48 object-cover" alt="Solar Panel">
-          <div class="p-4 flex-1 flex flex-col">
-            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Pending Verification</span>
-            <h3 class="font-bold mt-2 text-lg text-gray-800">380W Bifacial Panel</h3>
-            <p class="text-gray-600 text-sm">Condition: Like New (1 year old)</p>
-            <p class="text-blue-700 font-bold text-xl mt-2">$150.00</p>
-            <div class="mt-4 flex-1 flex items-end">
-            <button data-modal-target="marketplacePanelModal4" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View Details</button>
-            </div>
-          </div>
-        </div>
-      </div>
-</main>
-  </div>
-
-  <!-- Marketplace Panel Modals -->
-  <div id="marketplacePanelModal1" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md transform max-h-[80vh] flex flex-col">
-      <div class="flex justify-between items-center p-4 border-b">
-        <h3 class="text-xl font-bold">Panel Details</h3>
+              <svg class="w-full h-full" viewBox="0 0 36 36">
+                <path class="text-gray-200" stroke-width="3" fill="none" stroke="currentColor"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="text-blue-600 circle-chart-progress" stroke-width="3" fill="none" stroke-linecap="round"
+                  stroke="currentColor" stroke-dasharray="85, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-xl font-bold text-blue-900">8.5k</span>
         <button data-modal-close="marketplacePanelModal1" class="text-gray-500 hover:text-gray-800">&times;</button>
       </div>
       <div class="p-4 space-y-3 overflow-y-auto flex-1">
@@ -385,67 +166,94 @@
       <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg gap-3">
         <button data-modal-close="sellerQueryModal1" class="action-btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">Disapprove Listing</button>
         <button data-modal-close="sellerQueryModal1" class="action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Approve Listing</button>
-      </div>
-    </div>
+=======
+        <h2 class="text-2xl font-semibold mb-6 text-gray-700">Marketplace Management</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Panel 1 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
+            <img
+              src="https://images.pexels.com/photos/159397/solar-panel-array-power-sun-electricity-159397.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              class="w-full h-48 object-cover" alt="Solar Panel">
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
+              <h3 class="font-bold mt-2 text-lg text-gray-800">350W Monocrystalline Panel</h3>
+              <p class="text-gray-600 text-sm">Condition: Excellent (2 years old)</p>
+              <p class="text-blue-700 font-bold text-xl mt-2">$120.00</p>
+              <div class="mt-4 flex-1 flex items-end">
+                <button data-modal-target="marketplacePanelModal1"
+                  class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
+                  Details</button>
+              </div>
+            </div>
+          </div>
+          <!-- Panel 2 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
+            <img
+              src="https://images.pexels.com/photos/4148960/pexels-photo-4148960.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              class="w-full h-48 object-cover" alt="Solar Panel">
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
+              <h3 class="font-bold mt-2 text-lg text-gray-800">400W Polycrystalline Panel</h3>
+              <p class="text-gray-600 text-sm">Condition: Good (4 years old)</p>
+              <p class="text-blue-700 font-bold text-xl mt-2">$95.00</p>
+              <div class="mt-4 flex-1 flex items-end">
+                <button data-modal-target="marketplacePanelModal2"
+                  class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
+                  Details</button>
+              </div>
+            </div>
+          </div>
+          <!-- Panel 3 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-md border flex flex-col">
+            <img
+              src="https://images.pexels.com/photos/356073/pexels-photo-356073.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              class="w-full h-48 object-cover" alt="Solar Panel">
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>
+              <h3 class="font-bold mt-2 text-lg text-gray-800">320W Flexible Panel</h3>
+              <p class="text-gray-600 text-sm">Condition: Excellent (3 years old)</p>
+              <p class="text-blue-700 font-bold text-xl mt-2">$110.00</p>
+              <div class="mt-4 flex-1 flex items-end">
+                <button data-modal-target="marketplacePanelModal3"
+                  class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
+                  Details</button>
+              </div>
+            </div>
+          </div>
+          <!-- Panel 4 -->
+          <div class="bg-white rounded-lg overflow-hidden shadow-md border" style="opacity:0.65;" flex flex-col>
+            <img
+              src="https://images.pexels.com/photos/2873951/pexels-photo-2873951.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+              class="w-full h-48 object-cover" alt="Solar Panel">
+            <div class="p-4 flex-1 flex flex-col">
+              <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Pending Verification</span>
+              <h3 class="font-bold mt-2 text-lg text-gray-800">380W Bifacial Panel</h3>
+              <p class="text-gray-600 text-sm">Condition: Like New (1 year old)</p>
+              <p class="text-blue-700 font-bold text-xl mt-2">$150.00</p>
+              <div class="mt-4 flex-1 flex items-end">
+                <button data-modal-target="marketplacePanelModal4"
+                  class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
+                  Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </main>
   </div>
 
-  <div id="buyerQueryModal1" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
-      <div class="flex justify-between items-center p-4 border-b">
-        <h3 class="text-xl font-bold">Buyer Inquiry: General Requirement</h3>
-        <button data-modal-close="buyerQueryModal1" class="text-gray-500 hover:text-gray-800">&times;</button>
-      </div>
-      <div class="p-6 space-y-3">
-        <div><strong>Name:</strong> Rohan Mehta</div>
-        <div><strong>Phone:</strong> +91 99887 76655</div>
-        <div><strong>Address:</strong> 45, Solar Heights, Pune, Maharashtra</div>
-        <hr>
-        <h4 class="font-semibold text-lg pt-2">Requirements</h4>
-        <div class="text-sm space-y-2">
-            <p><strong>Required Wattage:</strong> 5000 W</p>
-            <p><strong>Budget:</strong> $2000</p>
-            <p><strong>Preference:</strong> Interested in Monocrystalline panels, open to any Tier 1 brand.</p>
-        </div>
-      </div>
-       <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
-        <button data-modal-close="buyerQueryModal1" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
-      </div>
-    </div>
-  </div>
-  
-  <div id="buyerQueryModal2" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
-      <div class="flex justify-between items-center p-4 border-b">
-        <h3 class="text-xl font-bold">Buyer Inquiry: Specific Panel</h3>
-        <button data-modal-close="buyerQueryModal2" class="text-gray-500 hover:text-gray-800">&times;</button>
-      </div>
-      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="space-y-3">
-            <h4 class="font-semibold text-lg border-b pb-2">Buyer Information</h4>
-            <div><strong>Name:</strong> Sunita Singh</div>
-            <div><strong>Phone:</strong> +91 91234 56789</div>
-            <div><strong>Address:</strong> 789, Sunshine Apartments, Nagpur, Maharashtra</div>
-        </div>
-        <div class="space-y-3">
-             <h4 class="font-semibold text-lg border-b pb-2">Seller of Interest</h4>
-            <div><strong>Name:</strong> Priya Patel</div>
-            <div><strong>Phone:</strong> +91 98765 11223</div>
-            <div><strong>Address:</strong> 101, Power Lane, Mumbai, Maharashtra</div>
-        </div>
-        <div class="md:col-span-2 pt-2">
-             <h4 class="font-semibold text-lg border-b pb-2">Panel of Interest</h4>
-             <p>350W Monocrystalline Panel (Excellent Condition)</p>
-        </div>
-      </div>
+  <!-- Marketplace Panel Modal 1 -->
+  <div id="marketplacePanelModal1"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md transform max-h-[80vh] flex flex-col">
+      <!-- Modal Header and Details omitted for brevity -->
       <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
-        <button data-modal-close="buyerQueryModal2" class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="confirmation-message" class="hidden fixed top-5 right-5 bg-blue-600 text-white py-2 px-5 rounded-lg shadow-lg z-50 transition-transform transform translate-x-full">
-    Action performed successfully.
-  </div>
+        <button class="action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 mr-2"
 
 </body>
 </html>
+=======
+
+</body>
+
+</html>
+>>>>>>> Stashed changes

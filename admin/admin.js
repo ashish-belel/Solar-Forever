@@ -32,10 +32,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Admin Login
   adminLoginForm.addEventListener('submit', function (e) {
+  // Admin Login
+  adminLoginForm.addEventListener('submit', function (e) {
     e.preventDefault();
+    const email = e.target.email.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
 
+    /*    // Simple validation (replace with actual auth)
+        if (email === 'adminuser@gmail.com' && password === 'solar@2025') {
+          adminLoginSection.classList.add('hidden');
+          adminDashboardSection.classList.remove('hidden');
+        } else {
+          adminLoginError.classList.remove('hidden');
+        }
+      });
+    */
+    // Firebase Email/Password Auth
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        adminLoginSection.classList.add('hidden');
+        adminDashboardSection.classList.remove('hidden');
+      })
+      .catch((error) => {
+        adminLoginError.classList.remove('hidden');
+        // Optionally, display error.message for debugging
+      });
+  });
     /*    // Simple validation (replace with actual auth)
         if (email === 'adminuser@gmail.com' && password === 'solar@2025') {
           adminLoginSection.classList.add('hidden');
@@ -152,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Listen for admin action button clicks inside modals
   document.querySelectorAll('.modal .action-btn').forEach(button => {
     button.addEventListener('click', function () {
+    button.addEventListener('click', function () {
       const panelId = button.getAttribute('data-panel-id');
       const actionType = button.getAttribute('data-action');
       if (panelId && actionType) {
@@ -165,6 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
   marketplaceActionButtons.forEach(button => {
     button.addEventListener('click', () => {
       let message = 'Panel status updated.';
+      if (button.textContent.includes('Sold')) message = 'Panel marked as sold.';
+      if (button.textContent.includes('De-list')) message = 'Panel has been de-listed.';
       if (button.textContent.includes('Sold')) message = 'Panel marked as sold.';
       if (button.textContent.includes('De-list')) message = 'Panel has been de-listed.';
       showConfirmation(message);
