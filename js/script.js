@@ -127,7 +127,26 @@ const firebaseConfig = {
         mobileMenu.classList.toggle('hidden');
       });
     }
+    // --- ADD THIS NEW SECTION ---
+    // --- Buy/Sell Modal Buttons ---
+    const buyBtn = document.getElementById('buy-btn');
+    const sellBtn = document.getElementById('sell-btn');
+    const buyOrSellModal = document.getElementById('buyOrSellModal');
 
+    if (buyBtn && buyOrSellModal) {
+      buyBtn.addEventListener('click', () => {
+        closeModal(buyOrSellModal); // Close the current modal
+        openModal('buyRequestModal'); // Open the "Buy Request" modal
+      });
+    }
+
+    if (sellBtn && buyOrSellModal) {
+      sellBtn.addEventListener('click', () => {
+        closeModal(buyOrSellModal); // Close the current modal
+        openModal('sellPanelModal'); // Open the "Sell Panel" modal
+      });
+    }
+    // --- END OF NEW SECTION ---
     // --- Auth Modal Tabs (Login/Signup) ---
     const loginTab = document.getElementById('login-tab-btn');
     const signupTab = document.getElementById('signup-tab-btn');
