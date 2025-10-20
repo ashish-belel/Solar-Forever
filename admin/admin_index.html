@@ -34,8 +34,10 @@
     <form id="admin-login-form" class="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
       <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Admin Login</h2>
       <div class="mb-4">
-        <label for="admin-username" class="block text-gray-700 font-semibold mb-2">Username</label>
-        <input id="admin-username" name="username" type="text" placeholder="adminuser" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+        <!-- Replaced username input with phone number input -->
+        <label for="admin-phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+        <input id="admin-phone" name="phone" type="tel" placeholder="+91XXXXXXXXXX"
+          class="w-full px-3 py-2 border border-gray-300 rounded" required>
       </div>
       <div class="mb-4">
         <label for="admin-password" class="block text-gray-700 font-semibold mb-2">Password</label>
