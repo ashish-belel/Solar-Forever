@@ -93,13 +93,10 @@
           journey for your peace of mind.</p>
         <div class="grid md:grid-cols-2 gap-12 text-left">
           <div>
-            <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" class="mr-3">
-                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-                <path d="M12 12v9" />
-                <path d="m16 16-4-4-4 4" />
-              </svg>For Selling Used Solar System</h3>
+            <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mx-auto mb-4">
+  <path d="M2 22s1-1 2-2c1-1 2-2 3-2s2 1 3 2 2-1 3-2 2 1 3 2c1 1 2 2 2 2H2z" />
+  <path d="M12,2A3,3 0 0,1 15,5A3,3 0 0,1 12,8A3,3 0 0,1 9,5A3,3 0 0,1 12,2M12,14C16,14 18,16 18,16V17H6V16C6,16 8,14 12,14Z" />
+</svg>
             <ol class="relative border-l border-gray-200">
               <li class="mb-10 ml-6">
                 <span
@@ -301,16 +298,14 @@
 
     <section id="mission" class="py-20 bg-white">
       <div class="container mx-auto px-6 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="text-green-500 mx-auto mb-4">
-          <path d="M2 22s1-1 2-2c1-1 2-2 3-2s2 1 3 2 2-1 3-2 2 1 3 2c1 1 2 2 2 2H2z" />
-          <path d="M12 14v- dubbio. H2-10" />
-          <path d="M9.88 12.12a3 3 0 1 0-4.24-4.24" />
-          <path d="m14.12 12.12a3 3 0 1 0 4.24-4.24" />
-          <path d="M12 2a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" />
-          <path d="m12 12 2-2-4-4-2 2Z" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" 
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+          class="text-green-500 mx-auto mb-4">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
         <h2 class="section-title mb-4">Our Mission & Goals</h2>
         <p class="section-subtitle mb-8 max-w-3xl mx-auto">To accelerate the world's transition to sustainable energy by
           creating a reliable and accessible circular economy for solar products.</p>
@@ -377,40 +372,64 @@
           Panels</button></div>
     </div>
   </div>
+  
   <div id="authModal" class="modal-backdrop">
-  <div class="modal-content">
-    <div class="flex border-b mb-6">
-      <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">Sign In</button>
-      <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
+    <div class="modal-content">
+      <div class="flex border-b mb-6">
+        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">Sign In</button>
+        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
+      </div>
+
+      <form id="login-form" class="space-y-4" novalidate>
+        <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
+        
+        <div id="login-phone-section">
+          <div>
+            <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input type="tel" id="login-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+        </div>
+
+        <div id="login-otp-section" class="hidden">
+          <div>
+            <label for="login-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+            <input type="text" id="login-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+        </div>
+
+        <div id="recaptcha-container-login"></div>
+        <button type="submit" id="login-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
+      </form>
+
+      <form id="signup-form" class="space-y-4 hidden" novalidate>
+        <h3 class="text-xl font-bold text-center">Create a New Account</h3>
+        
+        <div id="signup-details-section">
+          <div>
+            <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input type="text" id="signup-name" placeholder="Enter your full name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+          <div>
+            <label for="signup-address" class="block text-sm font-medium text-gray-700">Address</label>
+            <input type="text" id="signup-address" placeholder="Enter your address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+          <div>
+            <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input type="tel" id="signup-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+        </div>
+
+        <div id="signup-otp-section" class="hidden">
+          <div>
+            <label for="signup-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+            <input type="text" id="signup-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+          </div>
+        </div>
+        
+        <div id="recaptcha-container-signup"></div>
+        <button type="submit" id="signup-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign Up</button>
+      </form>
     </div>
-
-    <form id="login-form" class="space-y-4" novalidate>
-      <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
-      <div>
-        <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-        <input type="tel" id="login-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div id="recaptcha-container-login"></div>
-      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
-    </form>
-
-    <form id="signup-form" class="space-y-4 hidden" novalidate>
-      <h3 class="text-xl font-bold text-center">Create a New Account</h3>
-      <div>
-        <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-        <input type="text" id="signup-name" placeholder="Enter your full name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div>
-        <label for="signup-address" class="block text-sm font-medium text-gray-700">Address</label>
-        <input type="text" id="signup-address" placeholder="Enter your address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div>
-        <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-        <input type="tel" id="signup-phone" placeholder="+91 98765 43210" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
-      </div>
-      <div id="recaptcha-container-signup"></div>
-      <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign Up</button>
-    </form>
   </div>
 </div>
   </div>

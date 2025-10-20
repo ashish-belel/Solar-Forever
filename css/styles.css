@@ -1,4 +1,6 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* body {
   font-family: 'Poppins', sans-serif;
 }
 
@@ -83,4 +85,88 @@ body {
 .product-tab-btn.active {
   border-color: #3b82f6;
   color: #3b82f6;
+} */
+/* Import the Poppins font */
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'); */
+
+/* Apply the font to the body */
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Custom styles for section titles */
+.section-title {
+  font-size: 2.25rem; /* 36px */
+  font-weight: 700;
+  color: #1e3a8a; /* blue-900 */
+}
+
+.section-subtitle {
+  font-size: 1.125rem; /* 18px */
+  color: #4b5563; /* gray-600 */
+}
+
+/* Hero overlay */
+.hero-overlay {
+  background-color: rgba(17, 24, 39, 0.6); /* gray-900 with 60% opacity */
+}
+
+/* Modal Backdrop and Content */
+.modal-backdrop {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  /* Flexbox to center the content */
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  margin: auto;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+/* Scrolled header style */
+#header {
+  background-color: transparent;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+#header.scrolled {
+  background-color: #1e3a8a; /* blue-900 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Header link colors on scroll */
+#header.scrolled .nav-link,
+#header.scrolled #mobile-menu-button,
+#header.scrolled .text-2xl { /* Target the brand name */
+  color: #ffffff; /* white */
+}
+
+/* Special class for auth tabs */
+.tab-btn.active {
+  color: #2563eb; /* blue-600 */
+  border-color: #2563eb; /* blue-600 */
+}
+
+.tab-btn {
+  color: #6b7280; /* gray-500 */
+  border-color: transparent;
 }
