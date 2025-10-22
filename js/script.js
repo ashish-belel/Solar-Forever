@@ -3,14 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    apiKey: "AIzaSyBFazdEmqatvQaFgrEiC7btxohKXbkGOyw",
+    authDomain: "solar-forever.firebaseapp.com",
+    databaseURL: "https://solar-forever-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "solar-forever",
+    storageBucket: "solar-forever.firebasestorage.app",
+    messagingSenderId: "15804210993",
+    appId: "1:15804210993:web:f031750b9651e609b69a10",
+    measurementId: "G-T6955CSP1N"
   };
 
   // --- Initialize Firebase ---
