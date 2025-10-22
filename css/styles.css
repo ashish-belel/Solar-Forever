@@ -135,6 +135,7 @@ button:disabled {
 
 /* Scrolled Header Style */
 #header.scrolled {
-  background-color: #1e3a8a; /* This is Tailwind's 'blue-900' color */
+  background-color: #1e3a8a;
+  /* This is Tailwind's 'blue-900' color */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
