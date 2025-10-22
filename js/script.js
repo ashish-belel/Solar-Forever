@@ -1,17 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBFazdEmqatvQaFgrEiC7btxohKXbkGOyw",
-  authDomain: "solar-forever.firebaseapp.com",
-  databaseURL: "https://solar-forever-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "solar-forever",
-  storageBucket: "solar-forever.firebasestorage.app",
-  messagingSenderId: "15804210993",
-  appId: "1:15804210993:web:f031750b9651e609b69a10",
-  measurementId: "G-T6955CSP1N"
-};
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFazdEmqatvQaFgrEiC7btxohKXbkGOyw",
+    authDomain: "solar-forever.firebaseapp.com",
+    databaseURL: "https://solar-forever-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "solar-forever",
+    storageBucket: "solar-forever.firebasestorage.app",
+    messagingSenderId: "15804210993",
+    appId: "1:15804210993:web:f031750b9651e609b69a10",
+    measurementId: "G-T6955CSP1N"
+  };
+
   // --- Initialize Firebase ---
   try {
     const app = firebase.initializeApp(firebaseConfig);
@@ -23,27 +24,28 @@ const firebaseConfig = {
     const authModal = document.getElementById('authModal');
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
+    const buyOrSellModal = document.getElementById('buyOrSellModal');
+
 
     // =================================================================
     // PART 1: MODAL AND UI LOGIC
     // =================================================================
 
-    // --- Modal Helper Functions ---
+    // --- Modal Helper Functions --- (*** THIS IS THE CORRECTED PART ***)
     const openModal = (modalId) => {
       const modal = document.getElementById(modalId);
       if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.add('active'); // Use classList to show modal
       }
     };
 
     const closeModal = (modal) => {
       if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('active'); // Use classList to hide modal
       }
     };
 
     // --- Header "Login / Sign Up" Button ---
-    // THIS IS THE CODE FOR YOUR BUTTON
     const loginSignupBtn = document.getElementById('login-signup-btn-desktop');
     if (loginSignupBtn) {
       loginSignupBtn.addEventListener('click', () => {
@@ -127,11 +129,10 @@ const firebaseConfig = {
         mobileMenu.classList.toggle('hidden');
       });
     }
-    // --- ADD THIS NEW SECTION ---
+
     // --- Buy/Sell Modal Buttons ---
     const buyBtn = document.getElementById('buy-btn');
     const sellBtn = document.getElementById('sell-btn');
-    const buyOrSellModal = document.getElementById('buyOrSellModal');
 
     if (buyBtn && buyOrSellModal) {
       buyBtn.addEventListener('click', () => {
@@ -146,7 +147,7 @@ const firebaseConfig = {
         openModal('sellPanelModal'); // Open the "Sell Panel" modal
       });
     }
-    // --- END OF NEW SECTION ---
+
     // --- Auth Modal Tabs (Login/Signup) ---
     const loginTab = document.getElementById('login-tab-btn');
     const signupTab = document.getElementById('signup-tab-btn');
@@ -197,14 +198,13 @@ const firebaseConfig = {
       const loginBtnDesktop = document.getElementById('login-signup-btn-desktop');
       if (user) {
         console.log("User is signed in:", user.phoneNumber);
-        loginBtnDesktop.textContent = 'Logout';
+        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Logout';
       } else {
         console.log("User is signed out.");
-        loginBtnDesktop.textContent = 'Login / Sign Up';
+        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Login / Sign Up';
       }
     });
 
-    // Function to clear old reCAPTCHA
     // Function to clear old reCAPTCHA
     function clearRecaptcha() {
       if (window.recaptchaVerifier) {
@@ -212,29 +212,30 @@ const firebaseConfig = {
         window.recaptchaVerifier = null; // Set it to null after clearing
       }
     }
+
     // Function to reset auth forms to their original state
     function resetAuthForms() {
-        clearRecaptcha();
-        
-        // Reset Login Form
-        if(loginForm) loginForm.reset();
-        const loginPhoneSection = document.getElementById('login-phone-section');
-        const loginOtpSection = document.getElementById('login-otp-section');
-        const loginButton = document.getElementById('login-button');
-        
-        if (loginPhoneSection) loginPhoneSection.classList.remove('hidden');
-        if (loginOtpSection) loginOtpSection.classList.add('hidden');
-        if (loginButton) loginButton.textContent = 'Send OTP';
+      clearRecaptcha();
 
-        // Reset Signup Form
-        if(signupForm) signupForm.reset();
-        const signupDetailsSection = document.getElementById('signup-details-section');
-        const signupOtpSection = document.getElementById('signup-otp-section');
-        const signupButton = document.getElementById('signup-button');
+      // Reset Login Form
+      if (loginForm) loginForm.reset();
+      const loginPhoneSection = document.getElementById('login-phone-section');
+      const loginOtpSection = document.getElementById('login-otp-section');
+      const loginButton = document.getElementById('login-button');
 
-        if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
-        if (signupOtpSection) signupOtpSection.classList.add('hidden');
-        if (signupButton) signupButton.textContent = 'Send OTP & Sign Up';
+      if (loginPhoneSection) loginPhoneSection.classList.remove('hidden');
+      if (loginOtpSection) loginOtpSection.classList.add('hidden');
+      if (loginButton) loginButton.textContent = 'Send OTP';
+
+      // Reset Signup Form
+      if (signupForm) signupForm.reset();
+      const signupDetailsSection = document.getElementById('signup-details-section');
+      const signupOtpSection = document.getElementById('signup-otp-section');
+      const signupButton = document.getElementById('signup-button');
+
+      if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
+      if (signupOtpSection) signupOtpSection.classList.add('hidden');
+      if (signupButton) signupButton.textContent = 'Send OTP & Sign Up';
     }
 
 
@@ -247,9 +248,11 @@ const firebaseConfig = {
         if (loginButton.textContent.includes('Send')) {
           // Phase 1: Send OTP
           clearRecaptcha();
-          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-login', { 'size': 'invisible' });
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-login', {
+            'size': 'invisible'
+          });
           const phoneNumber = document.getElementById('login-phone').value;
-          
+
           auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
             .then(confirmationResult => {
               window.confirmationResult = confirmationResult;
@@ -262,15 +265,15 @@ const firebaseConfig = {
           // Phase 2: Verify OTP
           const otp = document.getElementById('login-otp').value;
           if (!otp) {
-              alert("Please enter the OTP.");
-              return;
+            alert("Please enter the OTP.");
+            return;
           }
           window.confirmationResult.confirm(otp).then(result => {
             alert("Successfully signed in!");
             closeModal(authModal);
             resetAuthForms();
           }).catch(error => {
-              alert("Invalid OTP: " + error.message);
+            alert("Invalid OTP: " + error.message);
           });
         }
       });
@@ -285,9 +288,11 @@ const firebaseConfig = {
         if (signupButton.textContent.includes('Send')) {
           // Phase 1: Send OTP
           clearRecaptcha();
-          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-signup', { 'size': 'invisible' });
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-signup', {
+            'size': 'invisible'
+          });
           const phoneNumber = document.getElementById('signup-phone').value;
-          
+
           auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
             .then(confirmationResult => {
               window.confirmationResult = confirmationResult;
@@ -300,14 +305,14 @@ const firebaseConfig = {
           // Phase 2: Verify OTP and Create Profile
           const otp = document.getElementById('signup-otp').value;
           if (!otp) {
-              alert("Please enter the OTP.");
-              return;
+            alert("Please enter the OTP.");
+            return;
           }
           window.confirmationResult.confirm(otp).then(result => {
             const user = result.user;
             const name = document.getElementById('signup-name').value;
             const address = document.getElementById('signup-address').value;
-            
+
             // Save user info to Firestore
             return db.collection('users').doc(user.uid).set({
               name: name,
