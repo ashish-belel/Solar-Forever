@@ -139,3 +139,30 @@ button:disabled {
   /* This is Tailwind's 'blue-900' color */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
+
+/* Mobile menu slide-in from right */
+#mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 70%; /* or adjust, e.g., 80% for wider panel */
+  height: 100vh;
+  background-color: rgba(30, 58, 138, 0.95); /* same blue-900 feel */
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+  padding-top: 4rem;
+}
+
+#mobile-menu.active {
+  right: 0;
+}
+
+#mobile-menu a {
+  display: block;
+  text-align: left;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+#mobile-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
