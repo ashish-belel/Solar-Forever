@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   // --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
@@ -336,4 +335,5 @@ const closeModal = (modal) => {
     console.error("Firebase initialization failed:", error);
     alert("Could not connect to services. Please try again later.");
   }
+
 });
