@@ -31,19 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
 
     // --- Modal Helper Functions ---
+// --- Modal Helper Functions (UPDATED to prevent background scroll) ---
     const openModal = (modalId) => {
       const modal = document.getElementById(modalId);
       if (modal) {
-        modal.classList.add('active'); // Use class for CSS transitions
+        modal.classList.add('active');
+        document.body.classList.add('modal-open'); // Add class to body
       }
     };
 
     const closeModal = (modal) => {
       if (modal) {
-        modal.classList.remove('active'); // Use class for CSS transitions
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open'); // Remove class from body
       }
     };
-
     // --- Header "Login / Sign Up" Button (Desktop) ---
     const loginSignupBtnDesktop = document.getElementById('login-signup-btn-desktop');
     if (loginSignupBtnDesktop) {

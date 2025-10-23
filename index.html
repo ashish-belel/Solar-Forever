@@ -532,33 +532,34 @@
     </div>
   </div>
 
-  <div id="productDetailModal" class="modal-backdrop">
-   <div class="modal-content relative" style="max-width: 400px; max-height: 500px; overflow: hidden;">
-     <button
+ <div id="productDetailModal" class="modal-backdrop">
+   <div class="modal-content relative" style="max-width: 400px; max-height: 500px;"> <button
        class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl close-modal-btn">&times;</button>
-        <div id="product-details-section" class="p-2">
-          <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
-            <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
-          </div>
-          <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
-          <h4 id="modal-product-title" class="text-xl font-semibold text-blue-900 mb-2"></h4>
-          <p id="modal-product-condition" class="text-gray-600 mb-2"></p>
-          <p class="text-base mb-4">A high-efficiency solar panel perfect for residential or commercial use. This unit has been professionally inspected and verified to meet our quality standards, ensuring reliable performance and excellent value.</p>
-          <h5 class="font-bold text-lg mb-2 text-blue-800">Specifications</h5>
-          <ul class="space-y-2 text-gray-700 mb-2">
-            <li><span class="font-bold">Price:</span> <span id="modal-product-price" class="text-lg text-blue-700"></span></li>
-            <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage"></span></li>
-            <li><span class="font-bold">Age:</span> <span id="modal-product-age"></span></li>
-            <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status" class="text-green-700"></span></li>
-            <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location" class="text-gray-800">New Delhi, India</span></li>
-          </ul>
-          <div class="flex justify-center mt-6 mb-2">
-            <button id="interested-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
-          </div>
-          <!-- Query message now handled by modal -->
-        </div>
-      </div>
-    </div>
+
+     <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
+
+       <div id="product-details-section" class="p-2">
+         <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
+           <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
+         </div>
+         <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
+         <h4 id="modal-product-title" class="text-xl font-semibold text-blue-900 mb-2"></h4>
+         <p id="modal-product-condition" class="text-gray-600 mb-2"></p>
+         <p class="text-base mb-4">A high-efficiency solar panel perfect for residential or commercial use. This unit has been professionally inspected and verified to meet our quality standards, ensuring reliable performance and excellent value.</p>
+         <h5 class="font-bold text-lg mb-2 text-blue-800">Specifications</h5>
+         <ul class="space-y-2 text-gray-700 mb-2">
+           <li><span class="font-bold">Price:</span> <span id="modal-product-price" class="text-lg text-blue-700"></span></li>
+           <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage"></span></li>
+           <li><span class="font-bold">Age:</span> <span id="modal-product-age"></span></li>
+           <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status" class="text-green-700"></span></li>
+           <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location" class="text-gray-800">New Delhi, India</span></li>
+         </ul>
+         <div class="flex justify-center mt-6 mb-2">
+           <button id="interested-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
+         </div>
+       </div>
+       </div> </div>
+  </div>
   </div>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
