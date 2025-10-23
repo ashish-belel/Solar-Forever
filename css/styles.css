@@ -54,7 +54,7 @@ body {
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 999;
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: center;
   opacity: 0;
