@@ -32,20 +32,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Modal Helper Functions --- (*** THIS IS THE CORRECTED PART ***)
     // --- Modal Helper Functions (UPDATED) ---
-const openModal = (modalId) => {
-  const modal = document.getElementById(modalId);
-  if (modal) {
-    // Instead of changing display, add the 'active' class
-    modal.classList.add('active');
-  }
-};
+    const openModal = (modalId) => {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        // Instead of changing display, add the 'active' class
+        modal.classList.add('active');
+      }
+    };
 
-const closeModal = (modal) => {
-  if (modal) {
-    // Instead of changing display, remove the 'active' class
-    modal.classList.remove('active');
-  }
-};
+    const closeModal = (modal) => {
+      if (modal) {
+        // Instead of changing display, remove the 'active' class
+        modal.classList.remove('active');
+      }
+    };
+
+    /**
+ * NEW: Auth Wall Function
+     * Checks if a user is logged in. If not, opens the auth modal.
+     * @returns {boolean} - true if user is logged in, false otherwise.
+     */
+    const requireAuth = () => {
+      if (currentUser) {
+        return true; // User is logged in, proceed.
+      } else {
+        openModal('authModal'); // User is not logged in, show login popup.
+        resetAuthForms();
+        return false; // Stop the original action.
+      }
+    };
 
     // --- Header "Login / Sign Up" Button ---
     const loginSignupBtn = document.getElementById('login-signup-btn-desktop');
@@ -97,6 +112,7 @@ const closeModal = (modal) => {
     const interestedBtn = document.getElementById('interested-btn');
     if (interestedBtn) {
       interestedBtn.addEventListener('click', () => {
+        if (!requireAuth()) return; // Stop if user is not logged in
         closeModal(document.getElementById('productDetailModal'));
         openModal('interestedQueryModal');
       });
@@ -133,6 +149,7 @@ const closeModal = (modal) => {
     }
 
     // --- Buy/Sell Modal Buttons ---
+    // UPDATED with auth wall
     const buyBtn = document.getElementById('buy-btn');
     const sellBtn = document.getElementById('sell-btn');
 
@@ -193,6 +210,33 @@ const closeModal = (modal) => {
     // =================================================================
     // PART 2: FIREBASE AUTH LOGIC
     // =================================================================
+    /**
+     * NEW: Friendly Error Handler
+     * Translates Firebase error codes into user-friendly messages.
+     * @param {object} error - The Firebase error object.
+     * @returns {string} - A user-friendly error message.
+     */
+    const handleAuthError = (error) => {
+      console.error("Auth Error:", error.code, error.message);
+      switch (error.code) {
+        case 'auth/invalid-phone-number':
+          return 'The phone number is not valid. Please check it (e.g., +91 XXXXX XXXXX).';
+        case 'auth/too-many-requests':
+          return 'You have tried too many times. Please wait a moment before trying again.';
+        case 'auth/invalid-verification-code':
+          return 'The OTP you entered is incorrect. Please try again.';
+        case 'auth/code-expired':
+          return 'The OTP has expired. Please request a new one.';
+        case 'auth/missing-verification-code':
+          return 'Please enter the 6-digit OTP.';
+        case 'auth/captcha-check-failed':
+          return 'reCAPTCHA verification failed. Please try again.';
+        case 'auth/user-disabled':
+          return 'This account has been disabled.';
+        default:
+          return 'An unexpected error occurred. Please try again.';
+      }
+    };
 
     // --- CORE AUTH LOGIC ---
     auth.onAuthStateChanged(user => {
@@ -213,6 +257,9 @@ const closeModal = (modal) => {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = null; // Set it to null after clearing
       }
+      // Also clear any visible reCAPTCHA badges that might be lingering
+      const recaptchaBadges = document.querySelectorAll('.grecaptcha-badge');
+      recaptchaBadges.forEach(badge => badge.style.display = 'none');
     }
 
     // Function to reset auth forms to their original state
@@ -221,6 +268,10 @@ const closeModal = (modal) => {
 
       // Reset Login Form
       if (loginForm) loginForm.reset();
+      document.getElementById('login-phone-section')?.classList.remove('hidden');
+      document.getElementById('login-otp-section')?.classList.add('hidden');
+      document.getElementById('login-button')?.textContent = 'Send OTP';
+      /*
       const loginPhoneSection = document.getElementById('login-phone-section');
       const loginOtpSection = document.getElementById('login-otp-section');
       const loginButton = document.getElementById('login-button');
@@ -228,9 +279,13 @@ const closeModal = (modal) => {
       if (loginPhoneSection) loginPhoneSection.classList.remove('hidden');
       if (loginOtpSection) loginOtpSection.classList.add('hidden');
       if (loginButton) loginButton.textContent = 'Send OTP';
-
+*/
       // Reset Signup Form
       if (signupForm) signupForm.reset();
+      document.getElementById('signup-details-section')?.classList.remove('hidden');
+      document.getElementById('signup-otp-section')?.classList.add('hidden');
+      document.getElementById('signup-button')?.textContent = 'Send OTP & Sign In';
+      /*
       const signupDetailsSection = document.getElementById('signup-details-section');
       const signupOtpSection = document.getElementById('signup-otp-section');
       const signupButton = document.getElementById('signup-button');
@@ -238,6 +293,7 @@ const closeModal = (modal) => {
       if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
       if (signupOtpSection) signupOtpSection.classList.add('hidden');
       if (signupButton) signupButton.textContent = 'Send OTP & Sign In';
+      */
     }
 
 
@@ -262,7 +318,7 @@ const closeModal = (modal) => {
               document.getElementById('login-otp-section').classList.remove('hidden');
               loginButton.textContent = 'Verify OTP';
               alert('OTP sent successfully!');
-            }).catch(error => alert("Sign in failed: " + error.message));
+            }).catch(error => alert(handleAuthError(error))); // <-- UPDATED
         } else {
           // Phase 2: Verify OTP
           const otp = document.getElementById('login-otp').value;
@@ -274,9 +330,7 @@ const closeModal = (modal) => {
             alert("Successfully signed in!");
             closeModal(authModal);
             resetAuthForms();
-          }).catch(error => {
-            alert("Invalid OTP: " + error.message);
-          });
+            }).catch(error => alert(handleAuthError(error))); // <-- UPDATED
         }
       });
     }
@@ -302,7 +356,7 @@ const closeModal = (modal) => {
               document.getElementById('signup-otp-section').classList.remove('hidden');
               signupButton.textContent = 'Create Account';
               alert('OTP sent successfully!');
-            }).catch(error => alert("Sign up failed: " + error.message));
+            }).catch(error => alert(handleAuthError(error))); // <-- UPDATED
         } else {
           // Phase 2: Verify OTP and Create Profile
           const otp = document.getElementById('signup-otp').value;
@@ -326,7 +380,7 @@ const closeModal = (modal) => {
             alert("Account created successfully!");
             closeModal(authModal);
             resetAuthForms();
-          }).catch(error => alert("Account creation failed: " + error.message));
+          }).catch(error => alert(handleAuthError(error))); // <-- UPDATED
         }
       });
     }
