@@ -32,18 +32,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // =================================================================
 
     // --- Modal Helper Functions --- (*** THIS IS THE CORRECTED PART ***)
-    const openModal = (modalId) => {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.add('active'); // Use classList to show modal
-      }
-    };
+    // --- Modal Helper Functions (UPDATED) ---
+const openModal = (modalId) => {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    // Instead of changing display, add the 'active' class
+    modal.classList.add('active');
+  }
+};
 
-    const closeModal = (modal) => {
-      if (modal) {
-        modal.classList.remove('active'); // Use classList to hide modal
-      }
-    };
+const closeModal = (modal) => {
+  if (modal) {
+    // Instead of changing display, remove the 'active' class
+    modal.classList.remove('active');
+  }
+};
 
     // --- Header "Login / Sign Up" Button ---
     const loginSignupBtn = document.getElementById('login-signup-btn-desktop');
