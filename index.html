@@ -34,7 +34,7 @@
       <div class="hidden lg:flex items-center space-x-4">
         <button id="login-signup-btn-desktop"
           class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Login
-          / Sign Up</button>
+          / Sign In</button>
       </div>
       <button id="mobile-menu-button" class="lg:hidden text-white">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -380,17 +380,17 @@
   <div id="authModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="flex border-b mb-6">
-        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold active">Sign In</button>
-        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold">Sign Up</button>
+        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold active">Log In</button>
+        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold">Sign In</button>
       </div>
 
       <form id="login-form" class="space-y-4" novalidate>
-        <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
+        <h3 class="text-xl font-bold text-center">Log In to Your Account</h3>
 
         <div id="login-phone-section">
           <div>
             <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input type="tel" id="login-phone" placeholder="+91 98765 43210"
+            <input type="tel" id="login-phone" placeholder="+91 XXXXX XXXXX"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
@@ -424,7 +424,7 @@
           </div>
           <div>
             <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input type="tel" id="signup-phone" placeholder="+91 98765 43210"
+            <input type="tel" id="signup-phone" placeholder="+91 XXXXX XXXXX"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
@@ -440,7 +440,7 @@
         <div id="recaptcha-container-signup"></div>
         <button type="submit" id="signup-button"
           class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign
-          Up</button>
+          In</button>
       </form>
     </div>
   </div>

@@ -203,7 +203,7 @@ const closeModal = (modal) => {
         if (loginBtnDesktop) loginBtnDesktop.textContent = 'Logout';
       } else {
         console.log("User is signed out.");
-        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Login / Sign Up';
+        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Login / Sign In';
       }
     });
 
@@ -237,7 +237,7 @@ const closeModal = (modal) => {
 
       if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
       if (signupOtpSection) signupOtpSection.classList.add('hidden');
-      if (signupButton) signupButton.textContent = 'Send OTP & Sign Up';
+      if (signupButton) signupButton.textContent = 'Send OTP & Sign In';
     }
 
 
