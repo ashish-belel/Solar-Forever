@@ -5,7 +5,16 @@ body {
   background: #f9fafb;
   color: #1e293b;
 }
+body.modal-open {
+  overflow: hidden; /* Prevent background scrolling */
+}
 
+.modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  display: flex; /* Make sure this is present for centering */
+}
 /* Hero overlay */
 .hero-overlay {
   background-color: rgba(0, 25, 50, 0.7);
@@ -139,7 +148,6 @@ button:disabled {
   /* This is Tailwind's 'blue-900' color */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
-
 /* Mobile menu slide-in from right */
 #mobile-menu {
   position: fixed;
