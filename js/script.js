@@ -383,7 +383,7 @@ if (buyForm) {
 
     try {
       // Add the buyer query initially with status "searching"
-      const docRef = await db.collection('buyerQueries').add({
+      const docRef = await db.collection('buyQueries').add({
         userId: currentUser.uid,
         wattage,
         budget,
@@ -393,7 +393,7 @@ if (buyForm) {
       });
 
       // Prepare query to find matches
-      let query = db.collection('buyerQueries');
+      let query = db.collection('buyQueries');
       if (wattage) query = query.where('wattage', '==', wattage);
       if (budget) query = query.where('budget', '==', budget);
       if (brand) query = query.where('brand', '==', brand);
