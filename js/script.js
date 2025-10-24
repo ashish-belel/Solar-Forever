@@ -376,45 +376,45 @@ if (buyForm) {
       return;
     }
 
-    // Collect form input values (adjust selectors as needed)
+    // Collect form input values
     const wattage = buyForm.querySelectorAll('input[type=number]')[0].value;
     const budget = buyForm.querySelectorAll('input[type=number]')[1].value;
     const brand = buyForm.querySelector('input[type=text]').value;
 
     try {
-      let query = db.collection('buyerQueries');
+      // Add the buyer query initially with status "searching"
+      const docRef = await db.collection('buyerQueries').add({
+        userId: currentUser.uid,
+        wattage,
+        budget,
+        brand,
+        status: 'searching',
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-      if (wattage) {
-        query = query.where('wattage', '==', wattage);
-      }
-      if (budget) {
-        // Assuming you want exact match; adjust if range query required
-        query = query.where('budget', '==', budget);
-      }
-      if (brand) {
-        query = query.where('brand', '==', brand);
-      }
+      // Prepare query to find matches
+      let query = db.collection('buyerQueries');
+      if (wattage) query = query.where('wattage', '==', wattage);
+      if (budget) query = query.where('budget', '==', budget);
+      if (brand) query = query.where('brand', '==', brand);
 
       const snapshot = await query.get();
 
       if (snapshot.empty) {
         alert('No matching buyers found.');
+        // Status remains "searching"
       } else {
-        const matches = [];
-        snapshot.forEach(doc => {
-          matches.push({ id: doc.id, ...doc.data() });
-        });
-        // TODO: Display matches in UI as needed
-        console.log('Matches found:', matches);
-        alert(`${matches.length} matches found! Check console.`);
-        // Reset form if you want
-        buyForm.reset();
-        // Optionally close modal
-        closeModal(document.getElementById('buyRequestModal'));
+        alert(`${snapshot.size} matches found!`);
+        // Update status to "found" for this buyer query document
+        await docRef.update({ status: 'found' });
       }
+
+      buyForm.reset();
+      closeModal(document.getElementById('buyRequestModal'));
+
     } catch (error) {
-      console.error('Error finding matches:', error);
-      alert('Error occurred while searching for matches. Please try again.');
+      console.error('Error processing buy request:', error);
+      alert('Error occurred while processing your request.');
     }
   });
 }
