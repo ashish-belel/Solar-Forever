@@ -59,20 +59,20 @@
         </svg>
       </button>
       <!-- END ADDED -->
-        <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
-        <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
-        <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
-        <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
-        <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
-        <div class="py-4 flex justify-center">
-          <!--<button id="get-started-btn-mobile"
+      <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
+      <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
+      <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
+      <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
+      <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
+      <div class="py-4 flex justify-center">
+        <!--<button id="get-started-btn-mobile"
             class="get-started-btn bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Get
             Started</button>-->
-          <button id="login-signup-btn-mobile"
-            class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Sign
-            In/Sign Up</button>
-        </div>
+        <button id="login-signup-btn-mobile"
+          class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Sign
+          In/Sign Up</button>
       </div>
+    </div>
   </header>
 
   <main>
@@ -554,10 +554,12 @@
   <div id="productDetailModal" class="modal-backdrop">
     <div class="modal-content relative" style="max-width: 400px; max-height: 500px; overflow: hidden;">
       <button
-        class="absolute top-2 right-4 text-gray-500 hover:text-gray-800 text-4xl font-light close-modal-btn">&times;</button>
+        class="absolute top-2 right-4 close-modal-btn font-bold text-2xl text-white hover:text-black transition-colors">
+        &times;
+      </button>
       <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
         <div id="product-details-section" class="p-2">
-          <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
+          <div class="bg-transparent rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
             <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
           </div>
           <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
