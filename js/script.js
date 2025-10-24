@@ -366,59 +366,58 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const buyForm = document.getElementById('buy-form');
-    if (buyForm) {
-      buyForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-          alert('Please sign in before submitting!');
-          openModal('authModal');
-          return;
-        }
-
-        // Collect values (adjust selectors as needed)
-        const wattage = buyForm.querySelectorAll('input[type=number]')[0].value;
-        const budget = buyForm.querySelectorAll('input[type=number]')[1].value;
-        const brand = buyForm.querySelector('input[type=text]').value;
-
-        // If you add file inputs for buyer queries:
-        const buyReceiptFile = document.getElementById('buy-receipt')?.files[0];
-        const buyImageFile = document.getElementById('buy-image')?.files[0];
-
-        let receiptUrl = '';
-        let imageUrl = '';
-        const storageRef = firebase.storage().ref();
-
-        if (buyImageFile) {
-          const imgSnap = await storageRef.child(`buyerQueries/${currentUser.uid}/${Date.now()}-panel`).put(buyImageFile);
-          imageUrl = await imgSnap.ref.getDownloadURL();
-        }
-
-        if (buyReceiptFile) {
-          const receiptSnap = await storageRef.child(`buyerQueries/${currentUser.uid}/${Date.now()}-receipt`).put(buyReceiptFile);
-          receiptUrl = await receiptSnap.ref.getDownloadURL();
-        }
-
-        db.collection('buyerQueries').add({
-          userId: currentUser.uid,
-          userPhone: currentUser.phoneNumber || '',
-          wattage,
-          budget,
-          brand,
-          imageUrl,
-          receiptUrl,
-          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert('Your buy request was submitted!');
-          buyForm.reset();
-          closeModal(document.getElementById('buyRequestModal'));
-        }).catch(error => {
-          alert('Error submitting buy request.');
-          console.error(error);
-        });
-      });
+const buyForm = document.getElementById('buy-form');
+if (buyForm) {
+  buyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      alert('Please sign in before submitting!');
+      openModal('authModal');
+      return;
     }
 
+    // Collect form input values (adjust selectors as needed)
+    const wattage = buyForm.querySelectorAll('input[type=number]')[0].value;
+    const budget = buyForm.querySelectorAll('input[type=number]')[1].value;
+    const brand = buyForm.querySelector('input[type=text]').value;
+
+    try {
+      let query = db.collection('buyerQueries');
+
+      if (wattage) {
+        query = query.where('wattage', '==', wattage);
+      }
+      if (budget) {
+        // Assuming you want exact match; adjust if range query required
+        query = query.where('budget', '==', budget);
+      }
+      if (brand) {
+        query = query.where('brand', '==', brand);
+      }
+
+      const snapshot = await query.get();
+
+      if (snapshot.empty) {
+        alert('No matching buyers found.');
+      } else {
+        const matches = [];
+        snapshot.forEach(doc => {
+          matches.push({ id: doc.id, ...doc.data() });
+        });
+        // TODO: Display matches in UI as needed
+        console.log('Matches found:', matches);
+        alert(`${matches.length} matches found! Check console.`);
+        // Reset form if you want
+        buyForm.reset();
+        // Optionally close modal
+        closeModal(document.getElementById('buyRequestModal'));
+      }
+    } catch (error) {
+      console.error('Error finding matches:', error);
+      alert('Error occurred while searching for matches. Please try again.');
+    }
+  });
+}
 
     // --- Sticky Header on Scroll ---
     const header = document.getElementById('header');
