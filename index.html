@@ -1,15 +1,3 @@
-  <!-- Interested Query Modal -->
-  <div id="interestedQueryModal" class="modal-backdrop">
-    <div class="modal-content text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-green-500 mx-auto mb-4">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-      <h3 class="text-xl font-bold">Query Registered!</h3>
-      <p class="text-gray-600 mt-2">Our experts will contact you soon to discuss purchase and installation details.</p>
-      <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn">Close</button>
-    </div>
-  </div>
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -21,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body class="bg-gray-50 text-gray-800">
@@ -46,7 +34,7 @@
       <div class="hidden lg:flex items-center space-x-4">
         <button id="login-signup-btn-desktop"
           class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Login
-          / Sign Up</button>
+          / Sign In</button>
       </div>
       <button id="mobile-menu-button" class="lg:hidden text-white">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -57,36 +45,18 @@
         </svg>
       </button>
     </nav>
-    <div id="mobile-menu" class="hidden lg:hidden bg-blue-900 bg-opacity-95 divide-y divide-blue-800">
-      <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
-      <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
-      <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
-      <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
-      <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
-      <div class="py-4 flex justify-center">
-        <button id="get-started-btn-mobile"
-          class="get-started-btn bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Get
-          Started</button>
-      </div>
+    <div id="mobile-menu" class="lg:hidden">
+      <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
+      <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
+      <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
+      <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
+      <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
       <div class="py-4 flex justify-center">
-        <button id="login-signup-btn-mobile"
-          class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Login / Sign Up
-        </button>
+        <button id="get-started-btn-mobile"
+          class="get-started-btn bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Get
+          Started</button>
       </div>
-    </div>
-
-    <div id="mobile-menu" class="hidden lg:hidden bg-blue-900 bg-opacity-95">
-      <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
-      <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
-      <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
-      <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
-      <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
-      <div class="py-4 flex justify-center">
-        <button id="get-started-btn-mobile"
-          class="get-started-btn bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Get
-          Started</button>
-      </div>
-    </div>
+    </div>
   </header>
 
   <main>
@@ -110,11 +80,16 @@
         <p class="section-subtitle mb-12 max-w-3xl mx-auto">Whether you're buying or selling, we've streamlined the
           journey for your peace of mind.</p>
         <div class="grid md:grid-cols-2 gap-12 text-left">
+
           <div>
-            <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mx-auto mb-4">
-  <path d="M2 22s1-1 2-2c1-1 2-2 3-2s2 1 3 2 2-1 3-2 2 1 3 2c1 1 2 2 2 2H2z" />
-  <path d="M12,2A3,3 0 0,1 15,5A3,3 0 0,1 12,8A3,3 0 0,1 9,5A3,3 0 0,1 12,2M12,14C16,14 18,16 18,16V17H6V16C6,16 8,14 12,14Z" />
-</svg>
+            <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
+              For Selling Your Solar System
+            </h3>
             <ol class="relative border-l border-gray-200">
               <li class="mb-10 ml-6">
                 <span
@@ -161,14 +136,17 @@
               </li>
             </ol>
           </div>
+
           <div>
-            <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" class="mr-3">
+            <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-              </svg>For Buying Used Solar System</h3>
+              </svg>
+              For Buying Used Solar System
+            </h3>
             <ol class="relative border-l border-gray-200">
               <li class="mb-10 ml-6">
                 <span
@@ -268,7 +246,9 @@
               class="w-full h-48 object-cover" alt="Solar Panel">
             <div class="p-4"><span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert
                 Verified</span>
-              <h3 class="font-bold mt-2 text-lg text-gray-800" style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">350W Monocrystalline Panel</h3>
+              <h3 class="font-bold mt-2 text-lg text-gray-800"
+                style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                350W Monocrystalline Panel</h3>
               <p class="text-gray-600 text-sm">Condition: Excellent (2 years old)</p>
               <p class="text-blue-700 font-bold text-xl mt-2">$120.00</p><button
                 class="view-details-btn w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
@@ -280,7 +260,9 @@
               class="w-full h-48 object-cover" alt="Solar Panel">
             <div class="p-4"><span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert
                 Verified</span>
-              <h3 class="font-bold mt-2 text-lg text-gray-800" style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">400W Polycrystalline Panel</h3>
+              <h3 class="font-bold mt-2 text-lg text-gray-800"
+                style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                400W Polycrystalline Panel</h3>
               <p class="text-gray-600 text-sm">Condition: Good (4 years old)</p>
               <p class="text-blue-700 font-bold text-xl mt-2">$95.00</p><button
                 class="view-details-btn w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
@@ -292,7 +274,9 @@
               class="w-full h-48 object-cover" alt="Solar Panel">
             <div class="p-4"><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Listing
                 Soon</span>
-              <h3 class="font-bold mt-2 text-lg text-gray-800" style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">380W Bifacial Panel</h3>
+              <h3 class="font-bold mt-2 text-lg text-gray-800"
+                style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                380W Bifacial Panel</h3>
               <p class="text-gray-600 text-sm">Condition: Like New (1 year old)</p>
               <p class="text-blue-700 font-bold text-xl mt-2">$150.00</p><button
                 class="w-full mt-4 bg-gray-400 text-white font-semibold py-2 rounded-lg cursor-not-allowed">Unavailable</button>
@@ -303,7 +287,9 @@
               class="w-full h-48 object-cover" alt="Solar Panel">
             <div class="p-4"><span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert
                 Verified</span>
-              <h3 class="font-bold mt-2 text-lg text-gray-800" style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">320W Flexible Panel</h3>
+              <h3 class="font-bold mt-2 text-lg text-gray-800"
+                style="width:250px;height:56px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                320W Flexible Panel</h3>
               <p class="text-gray-600 text-sm">Condition: Excellent (3 years old)</p>
               <p class="text-blue-700 font-bold text-xl mt-2">$110.00</p><button
                 class="view-details-btn w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">View
@@ -316,14 +302,14 @@
 
     <section id="mission" class="py-20 bg-white">
       <div class="container mx-auto px-6 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" 
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-          class="text-green-500 mx-auto mb-4">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-          <circle cx="9" cy="7" r="4"></circle>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"          
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"          
+          class="text-green-500 mx-auto mb-4">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
         <h2 class="section-title mb-4">Our Mission & Goals</h2>
         <p class="section-subtitle mb-8 max-w-3xl mx-auto">To accelerate the world's transition to sustainable energy by
           creating a reliable and accessible circular economy for solar products.</p>
@@ -390,72 +376,75 @@
           Panels</button></div>
     </div>
   </div>
-  
+
   <div id="authModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="flex border-b mb-6">
-        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">Sign In</button>
-        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
+        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold active">Log In</button>
+        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold">Sign In</button>
       </div>
 
       <form id="login-form" class="space-y-4" novalidate>
-        <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
-        
+        <h3 class="text-xl font-bold text-center">Log In to Your Account</h3>
+
         <div id="login-phone-section">
           <div>
             <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <div class="relative">
-  <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">+91</span>
-  <input type="tel" id="login-phone" placeholder="98765 43210" class="mt-1 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm" required pattern="\d{10}" title="Please enter a 10-digit phone number">
-</div>
+            <input type="tel" id="login-phone" placeholder="+91 XXXXX XXXXX"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
 
         <div id="login-otp-section" class="hidden">
           <div>
             <label for="login-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
-            <input type="text" id="login-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            <input type="text" id="login-otp" placeholder="123456"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
 
         <div id="recaptcha-container-login"></div>
-        <button type="submit" id="login-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
+        <button type="submit" id="login-button"
+          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
       </form>
 
       <form id="signup-form" class="space-y-4 hidden" novalidate>
         <h3 class="text-xl font-bold text-center">Create a New Account</h3>
-        
+
         <div id="signup-details-section">
           <div>
             <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
-            <input type="text" id="signup-name" placeholder="Enter your full name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            <input type="text" id="signup-name" placeholder="Enter your full name"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
           <div>
             <label for="signup-address" class="block text-sm font-medium text-gray-700">Address</label>
-            <input type="text" id="signup-address" placeholder="Enter your address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            <input type="text" id="signup-address" placeholder="Enter your address"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
           <div>
             <label for="signup-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-            <div class="relative">
-   <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">+91</span>
-   <input type="tel" id="signup-phone" placeholder="98765 43210" class="mt-1 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm" required pattern="\d{10}" title="Please enter a 10-digit phone number">
-</div>
+            <input type="tel" id="signup-phone" placeholder="+91 XXXXX XXXXX"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
 
         <div id="signup-otp-section" class="hidden">
           <div>
             <label for="signup-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
-            <input type="text" id="signup-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
+            <input type="text" id="signup-otp" placeholder="123456"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required>
           </div>
         </div>
-        
+
         <div id="recaptcha-container-signup"></div>
-        <button type="submit" id="signup-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign Up</button>
+        <button type="submit" id="signup-button"
+          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign
+          In</button>
       </form>
     </div>
   </div>
-</div>
+  </div>
   </div>
   <div id="sellPanelModal" class="modal-backdrop">
     <div class="modal-content">
@@ -531,41 +520,61 @@
       </div>
     </div>
   </div>
-
- <div id="productDetailModal" class="modal-backdrop">
-   <div class="modal-content relative" style="max-width: 400px; max-height: 500px;"> <button
-       class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl close-modal-btn">&times;</button>
-
-     <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
-
-       <div id="product-details-section" class="p-2">
-         <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
-           <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
-         </div>
-         <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
-         <h4 id="modal-product-title" class="text-xl font-semibold text-blue-900 mb-2"></h4>
-         <p id="modal-product-condition" class="text-gray-600 mb-2"></p>
-         <p class="text-base mb-4">A high-efficiency solar panel perfect for residential or commercial use. This unit has been professionally inspected and verified to meet our quality standards, ensuring reliable performance and excellent value.</p>
-         <h5 class="font-bold text-lg mb-2 text-blue-800">Specifications</h5>
-         <ul class="space-y-2 text-gray-700 mb-2">
-           <li><span class="font-bold">Price:</span> <span id="modal-product-price" class="text-lg text-blue-700"></span></li>
-           <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage"></span></li>
-           <li><span class="font-bold">Age:</span> <span id="modal-product-age"></span></li>
-           <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status" class="text-green-700"></span></li>
-           <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location" class="text-gray-800">New Delhi, India</span></li>
-         </ul>
-         <div class="flex justify-center mt-6 mb-2">
-           <button id="interested-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
-         </div>
-       </div>
-       </div> </div>
+  <!-- Interested Query Modal -->
+  <div id="interestedQueryModal" class="modal-backdrop">
+    <div class="modal-content text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="w-16 h-16 text-green-500 mx-auto mb-4">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+      <h3 class="text-xl font-bold">Query Registered!</h3>
+      <p class="text-gray-600 mt-2">Our experts will contact you soon to discuss purchase and installation details.</p>
+      <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn">Close</button>
+    </div>
   </div>
+
+  <div id="productDetailModal" class="modal-backdrop">
+    <div class="modal-content relative" style="max-width: 400px; max-height: 500px; overflow: hidden;">
+      <button
+        class="absolute top-2 right-4 text-gray-500 hover:text-gray-800 text-4xl font-light close-modal-btn">&times;</button>
+      <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
+        <div id="product-details-section" class="p-2">
+          <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
+            <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
+          </div>
+          <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
+          <h4 id="modal-product-title" class="text-xl font-semibold text-blue-900 mb-2"></h4>
+          <p id="modal-product-condition" class="text-gray-600 mb-2"></p>
+          <p class="text-base mb-4">A high-efficiency solar panel perfect for residential or commercial use. This unit
+            has been professionally inspected and verified to meet our quality standards, ensuring reliable performance
+            and excellent value.</p>
+          <h5 class="font-bold text-lg mb-2 text-blue-800">Specifications</h5>
+          <ul class="space-y-2 text-gray-700 mb-2">
+            <li><span class="font-bold">Price:</span> <span id="modal-product-price"
+                class="text-lg text-blue-700"></span></li>
+            <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage"></span></li>
+            <li><span class="font-bold">Age:</span> <span id="modal-product-age"></span></li>
+            <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status"
+                class="text-green-700"></span></li>
+            <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location"
+                class="text-gray-800">New Delhi, India</span></li>
+          </ul>
+          <div class="flex justify-center mt-6 mb-2">
+            <button id="interested-btn"
+              class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
+          </div>
+          <!-- Query message now handled by modal -->
+        </div>
+      </div>
+    </div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-  <script src="js/script.js"></script>
+  <script src="./js/script.js"></script>
 </body>
 
 </html>
