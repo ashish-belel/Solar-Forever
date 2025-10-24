@@ -80,6 +80,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // --- "Login / Sign Up" Button (Mobile) ---
+    const loginSignupBtnMobile = document.getElementById('login-signup-btn-mobile');
+    if (loginSignupBtnMobile) {
+      loginSignupBtnMobile.addEventListener('click', () => {
+        if (currentUser) {
+          // If user is logged in, log them out
+          auth.signOut();
+        } else {
+          // If user is logged out, show login modal
+          openModal('authModal');
+          resetAuthForms();
+        }
+      });
+    }
+
     // --- "View Details" Buttons in Marketplace ---
     const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
     viewDetailsBtns.forEach(btn => {
