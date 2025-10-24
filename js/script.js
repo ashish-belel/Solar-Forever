@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modal) {
         // Instead of changing display, add the 'active' class
         modal.classList.add('active');
+        document.body.classList.add('modal-open'); // Add class to body
       }
     };
 
@@ -44,10 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modal) {
         // Instead of changing display, remove the 'active' class
         modal.classList.remove('active');
+        document.body.classList.remove('modal-open'); // Remove class from body
       }
     };
 
-    // --- Header "Login / Sign Up" Button ---
+    // --- Header "Sign In / Sign Up" Button ---
     const loginSignupBtn = document.getElementById('login-signup-btn-desktop');
     if (loginSignupBtn) {
       loginSignupBtn.addEventListener('click', () => {
@@ -66,14 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const getStartedBtns = document.querySelectorAll('.get-started-btn');
     getStartedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        if (currentUser) {
+        openModal('buyOrSellModal');
+        /*if (currentUser) {
           // User is logged in → show buy/sell modal
           openModal('buyOrSellModal');
         } else {
           // User not logged in → open login modal
           openModal('authModal');
           resetAuthForms();
-        }
+        }*/
       });
     });
 
@@ -81,6 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
     viewDetailsBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
+        /*
+        // --- ADDED: Auth check for viewing details ---
+        if (!currentUser) {
+          alert("Please log in or sign up to view product details.");
+          openModal('authModal');
+          resetAuthForms();
+          return; // Stop execution
+        }
+        // --- END ADDED BLOCK ---
+        */
         openModal('productDetailModal');
         const card = e.target.closest('.group');
         const title = card.querySelector('h3').textContent;
@@ -111,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           // Not logged in → show login modal
           closeModal(document.getElementById('productDetailModal'));
+          alert("Please sign in to express your interest.");
           openModal('authModal');
           resetAuthForms();
         }
@@ -138,34 +152,80 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // --- Mobile Menu Button (Slide-in from right) ---
+        // --- MODIFIED: Mobile Menu Logic ---
     const mobileMenuBtn = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenuBtn && mobileMenu) {
-      mobileMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('active');
-      });
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const mobileMenuCloseBtn = document.getElementById('mobile-menu-close-btn');
+
+    const openMobileMenu = () => {
+      if (mobileMenu) mobileMenu.classList.add('active');
+      if (mobileMenuOverlay) mobileMenuOverlay.classList.add('active');
+      document.body.classList.add('modal-open'); // Prevent background scrolling
+    };
+
+    const closeMobileMenu = () => {
+      if (mobileMenu) mobileMenu.classList.remove('active');
+      if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('active');
+      document.body.classList.remove('modal-open'); // Allow background scrolling
+    };
+
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', openMobileMenu);
     }
+
+    if (mobileMenuCloseBtn) {
+      mobileMenuCloseBtn.addEventListener('click', closeMobileMenu);
+    }
+
+    if (mobileMenuOverlay) {
+      mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+    }
+    
+    // ADDED: Close menu when a nav link is clicked
+    const mobileNavLinks = document.querySelectorAll('#mobile-menu .nav-link-mobile');
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+    // --- END OF MENU MODIFICATIONS ---
 
     // --- Buy/Sell Modal Buttons ---
     const buyBtn = document.getElementById('buy-btn');
     const sellBtn = document.getElementById('sell-btn');
 
-    if (buyBtn && buyOrSellModal) {
+  if (buyBtn && buyOrSellModal) {
+      // --- MODIFIED: Added auth check as requested ---
       buyBtn.addEventListener('click', () => {
-        closeModal(buyOrSellModal); // Close the current modal
-        openModal('buyRequestModal'); // Open the "Buy Request" modal
+        if (currentUser) {
+          closeModal(buyOrSellModal);
+          openModal('buyRequestModal');
+        } else {
+          alert("Please log in or sign up to buy panels."); // Your custom alert
+          closeModal(buyOrSellModal);
+          openModal('authModal');
+          resetAuthForms();
+        }
       });
+      // --- END MODIFIED BLOCK ---
     }
 
     if (sellBtn && buyOrSellModal) {
+      // --- MODIFIED: Added auth check as requested ---
       sellBtn.addEventListener('click', () => {
-        closeModal(buyOrSellModal); // Close the current modal
-        openModal('sellPanelModal'); // Open the "Sell Panel" modal
+        if (currentUser) {
+          closeModal(buyOrSellModal);
+          openModal('sellPanelModal');
+        } else {
+          alert("Please log in or sign up to sell panels."); // Your custom alert
+          closeModal(buyOrSellModal);
+          openModal('authModal');
+          resetAuthForms();
+        }
       });
+      // --- END MODIFIED BLOCK ---
     }
 
-    // --- Auth Modal Tabs (Login/Signup) ---
+    // --- Auth Modal Tabs (Sign In/Sign Up) ---
     const loginTab = document.getElementById('login-tab-btn');
     const signupTab = document.getElementById('signup-tab-btn');
     if (loginTab && signupTab && loginForm && signupForm) {
@@ -218,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (loginBtnDesktop) loginBtnDesktop.textContent = 'Logout';
       } else {
         console.log("User is signed out.");
-        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Login / Sign In';
+        if (loginBtnDesktop) loginBtnDesktop.textContent = 'Sign In / Sign Up';
       }
     });
 
@@ -252,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
       if (signupOtpSection) signupOtpSection.classList.add('hidden');
-      if (signupButton) signupButton.textContent = 'Send OTP & Sign In';
+      if (signupButton) signupButton.textContent = 'Send OTP & Sign Up';
     }
 
 
