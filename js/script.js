@@ -145,6 +145,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+    // Gather product details from the modal (example ids, adapt for your markup)
+    const productTitle = document.getElementById('modal-product-title').textContent;
+    const productId = document.getElementById('modal-product-id') ? document.getElementById('modal-product-id').textContent : '';
+    const userId = currentUser.uid;
+    const phoneNumber = currentUser.phoneNumber || 'N/A';
+
+    // Save new interest query to Firestore
+    db.collection('interestedQueries').add({
+      productId: productId,
+      productTitle: productTitle,
+      userId: userId,
+      userPhone: phoneNumber,
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      closeModal(document.getElementById('productDetailModal'));
+      openModal('interestedQueryModal');
+      // Optional: Display success message or toast
+    }).catch(error => {
+      alert('Could not register your query. Please try again later.');
+      console.error('Error writing interested query:', error);
+    });
 
     // --- All "Close" Buttons ---
     const closeBtns = document.querySelectorAll('.close-modal-btn');
@@ -167,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-        // --- MODIFIED: Mobile Menu Logic ---
+    // --- MODIFIED: Mobile Menu Logic ---
     const mobileMenuBtn = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
@@ -196,11 +217,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mobileMenuOverlay) {
       mobileMenuOverlay.addEventListener('click', closeMobileMenu);
     }
-    
+
     // ADDED: Close menu when a nav link is clicked
     const mobileNavLinks = document.querySelectorAll('#mobile-menu .nav-link-mobile');
     mobileNavLinks.forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
+      link.addEventListener('click', closeMobileMenu);
     });
     // --- END OF MENU MODIFICATIONS ---
 
@@ -208,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const buyBtn = document.getElementById('buy-btn');
     const sellBtn = document.getElementById('sell-btn');
 
-  if (buyBtn && buyOrSellModal) {
+    if (buyBtn && buyOrSellModal) {
       // --- MODIFIED: Added auth check as requested ---
       buyBtn.addEventListener('click', () => {
         if (currentUser) {
