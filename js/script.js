@@ -130,6 +130,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- "Interested?" Button (inside Product Detail Modal) ---
     const interestedBtn = document.getElementById('interested-btn');
+if (interestedBtn) {
+  interestedBtn.addEventListener('click', () => {
+    closeModal(document.getElementById('productDetailModal'));
+    if (currentUser) {
+      // Gather product and user info
+      const productTitle = document.getElementById('modal-product-title')?.textContent || '';
+      const productId    = document.getElementById('modal-product-id')?.textContent || '';
+      const userId       = currentUser.uid;
+      const phoneNumber  = currentUser.phoneNumber || '';
+
+      // Submit to Firestore
+      db.collection('interestedQueries').add({
+        productId: productId,
+        productTitle: productTitle,
+        userId: userId,
+        userPhone: phoneNumber,
+        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        openModal('interestedQueryModal');
+      }).catch(error => {
+        alert('Could not register your interest. Please try again.');
+        console.error('Error writing interested query:', error);
+      });
+    } else {
+      alert("Please sign in to express your interest.");
+      openModal('authModal');
+      resetAuthForms();
+    }
+  });
+}
+    /*const interestedBtn = document.getElementById('interested-btn');
     if (interestedBtn) {
       interestedBtn.addEventListener('click', () => {
         if (currentUser) {
@@ -166,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Could not register your query. Please try again later.');
       console.error('Error writing interested query:', error);
     });
-
+   */
     // --- All "Close" Buttons ---
     const closeBtns = document.querySelectorAll('.close-modal-btn');
     closeBtns.forEach(btn => {
