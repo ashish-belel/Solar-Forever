@@ -130,36 +130,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- "Interested?" Button (inside Product Detail Modal) ---
     const interestedBtn = document.getElementById('interested-btn');
-if (interestedBtn) {
-  interestedBtn.addEventListener('click', () => {
-    closeModal(document.getElementById('productDetailModal'));
-    if (currentUser) {
-      // Gather product and user info
-      const productTitle = document.getElementById('modal-product-title')?.textContent || '';
-      const productId    = document.getElementById('modal-product-id')?.textContent || '';
-      const userId       = currentUser.uid;
-      const phoneNumber  = currentUser.phoneNumber || '';
+    if (interestedBtn) {
+      interestedBtn.addEventListener('click', () => {
+        closeModal(document.getElementById('productDetailModal'));
+        if (currentUser) {
+          // Gather product and user info
+          const productTitle = document.getElementById('modal-product-title')?.textContent || '';
+          const productId = document.getElementById('modal-product-id')?.textContent || '';
+          const userId = currentUser.uid;
+          const phoneNumber = currentUser.phoneNumber || '';
 
-      // Submit to Firestore
-      db.collection('interestedQueries').add({
-        productId: productId,
-        productTitle: productTitle,
-        userId: userId,
-        userPhone: phoneNumber,
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        openModal('interestedQueryModal');
-      }).catch(error => {
-        alert('Could not register your interest. Please try again.');
-        console.error('Error writing interested query:', error);
+          // Submit to Firestore
+          db.collection('interestedQueries').add({
+            productId: productId,
+            productTitle: productTitle,
+            userId: userId,
+            userPhone: phoneNumber,
+            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).then(() => {
+            openModal('interestedQueryModal');
+          }).catch(error => {
+            alert('Could not register your interest. Please try again.');
+            console.error('Error writing interested query:', error);
+          });
+        } else {
+          alert("Please sign in to express your interest.");
+          openModal('authModal');
+          resetAuthForms();
+        }
       });
-    } else {
-      alert("Please sign in to express your interest.");
-      openModal('authModal');
-      resetAuthForms();
     }
-  });
-}
     /*const interestedBtn = document.getElementById('interested-btn');
     if (interestedBtn) {
       interestedBtn.addEventListener('click', () => {
@@ -312,6 +312,113 @@ if (interestedBtn) {
         resetAuthForms();
       });
     }
+
+    const sellForm = document.getElementById('sell-form');
+    if (sellForm) {
+      sellForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+          alert('Please sign in before submitting!');
+          openModal('authModal');
+          return;
+        }
+
+        // Collect form fields (adjust IDs if different)
+        const purchaseDate = sellForm.querySelector('input[type=date]').value;
+        const sellerName = sellForm.querySelector('input[type=text]').value; // match to correct seller field
+        const panelParams = sellForm.querySelectorAll('input[type=text]')[1].value; // second text input for params
+        const sellReceiptFile = document.getElementById('sell-receipt').files[0];
+        const sellImageFile = document.getElementById('sell-image').files[0];
+
+        let receiptUrl = '';
+        let imageUrl = '';
+        const storageRef = firebase.storage().ref();
+
+        // Upload panel image (required)
+        if (sellImageFile) {
+          const imgSnap = await storageRef.child(`sellerQueries/${currentUser.uid}/${Date.now()}-panel`).put(sellImageFile);
+          imageUrl = await imgSnap.ref.getDownloadURL();
+        }
+
+        // Upload receipt if provided (optional)
+        if (sellReceiptFile) {
+          const receiptSnap = await storageRef.child(`sellerQueries/${currentUser.uid}/${Date.now()}-receipt`).put(sellReceiptFile);
+          receiptUrl = await receiptSnap.ref.getDownloadURL();
+        }
+
+        db.collection('sellerQueries').add({
+          userId: currentUser.uid,
+          userPhone: currentUser.phoneNumber || '',
+          purchaseDate,
+          sellerName,
+          panelParams,
+          imageUrl,
+          receiptUrl,
+          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert('Sell request submitted!');
+          sellForm.reset();
+          closeModal(document.getElementById('sellPanelModal'));
+        }).catch(error => {
+          alert('Error submitting request.');
+          console.error(error);
+        });
+      });
+    }
+
+    const buyForm = document.getElementById('buy-form');
+    if (buyForm) {
+      buyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) {
+          alert('Please sign in before submitting!');
+          openModal('authModal');
+          return;
+        }
+
+        // Collect values (adjust selectors as needed)
+        const wattage = buyForm.querySelectorAll('input[type=number]')[0].value;
+        const budget = buyForm.querySelectorAll('input[type=number]')[1].value;
+        const brand = buyForm.querySelector('input[type=text]').value;
+
+        // If you add file inputs for buyer queries:
+        const buyReceiptFile = document.getElementById('buy-receipt')?.files[0];
+        const buyImageFile = document.getElementById('buy-image')?.files[0];
+
+        let receiptUrl = '';
+        let imageUrl = '';
+        const storageRef = firebase.storage().ref();
+
+        if (buyImageFile) {
+          const imgSnap = await storageRef.child(`buyerQueries/${currentUser.uid}/${Date.now()}-panel`).put(buyImageFile);
+          imageUrl = await imgSnap.ref.getDownloadURL();
+        }
+
+        if (buyReceiptFile) {
+          const receiptSnap = await storageRef.child(`buyerQueries/${currentUser.uid}/${Date.now()}-receipt`).put(buyReceiptFile);
+          receiptUrl = await receiptSnap.ref.getDownloadURL();
+        }
+
+        db.collection('buyerQueries').add({
+          userId: currentUser.uid,
+          userPhone: currentUser.phoneNumber || '',
+          wattage,
+          budget,
+          brand,
+          imageUrl,
+          receiptUrl,
+          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert('Your buy request was submitted!');
+          buyForm.reset();
+          closeModal(document.getElementById('buyRequestModal'));
+        }).catch(error => {
+          alert('Error submitting buy request.');
+          console.error(error);
+        });
+      });
+    }
+
 
     // --- Sticky Header on Scroll ---
     const header = document.getElementById('header');
