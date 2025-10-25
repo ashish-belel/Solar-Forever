@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/styles.css">
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="./firebase.js"></script>
   <script defer src="./admin.js"></script>
   <style>
@@ -354,22 +355,20 @@
     </div>
   </div>
 
-<!-- Seller Verification Modal -->
-<div id="sellerQueryModal1" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-  <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
-    <!-- Seller Info section (add your dynamic content here) -->
-    <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg gap-3">
-      <!-- Disapprove Button -->
-      <button class="action-btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700" data-action="disapprove" data-panel-id="seller1">
-        Disapprove Listing
-      </button>
-      <!-- Approve Button -->
-      <button class="action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700" data-action="approve" data-panel-id="seller1">
-        Approve Listing
-      </button>
+  <!-- Seller Verification Modal 1 -->
+  <div id="sellerQueryModal1"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+      <!-- Seller Info section omitted for brevity -->
+
+      <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg gap-3">
+        <button class="action-btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700"
+          data-action="disapprove" data-panel-id="seller1">Disapprove Listing</button>
+        <button class="action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"
+          data-action="approve" data-panel-id="seller1">Approve Listing</button>
+      </div>
     </div>
   </div>
-</div>
   <!-- Buyer Inquiry Modal 1 -->
   <div id="buyerQueryModal1"
     class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
@@ -429,8 +428,6 @@
       </div>
     </div>
   </div>
-
-
 </body>
 
 </html>
