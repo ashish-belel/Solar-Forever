@@ -462,22 +462,27 @@
   </div>
   </div>
   </div>
+  <!-- Sell Panel Modal -->
   <div id="sellPanelModal" class="modal-backdrop">
     <div class="modal-content">
       <h2 class="text-2xl font-bold mb-6 text-center">Sell Your Solar Panel</h2>
       <form id="sell-form" class="space-y-4">
-        <div><label class="block text-sm font-medium">When did you purchase it?</label><input type="date"
+        <div><label class="block text-sm font-medium">When did you purchase it?</label>
+          <input type="date" name="purchase-date"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required></div>
-        <div><label class="block text-sm font-medium">Who did you purchase it from?</label><input type="text"
+        <div><label class="block text-sm font-medium">Who did you purchase it from?</label>
+          <input type="text" name="purchased-from"
             placeholder="e.g., SunPower, Local Installer"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required></div>
-        <div><label class="block text-sm font-medium">Panel Parameters (e.g., 350W, Monocrystalline)</label><input
-            type="text" placeholder="Brand, Model, Wattage"
+        <div><label class="block text-sm font-medium">Panel Parameters (e.g., 350W, Monocrystalline)</label>
+          <input type="text" name="panel-params" placeholder="Brand, Model, Wattage"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required></div>
-        <div><label class="block text-sm font-medium">Upload receipt (optional)</label><input type="file"
+        <div><label class="block text-sm font-medium">Upload receipt (optional)</label>
+          <input type="file" id="sell-receipt" accept="image/*"
             class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
         </div>
-        <div><label class="block text-sm font-medium">Upload image of solar panel</label><input type="file"
+        <div><label class="block text-sm font-medium">Upload image of solar panel</label>
+          <input type="file" id="sell-image" accept="image/*"
             class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             required></div><button type="submit"
           class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit for
@@ -496,18 +501,22 @@
       </div>
     </div>
   </div>
+  <!-- Buy Request Modal -->
   <div id="buyRequestModal" class="modal-backdrop">
     <div class="modal-content">
       <h2 class="text-2xl font-bold mb-6 text-center">Find Your Perfect Panel</h2>
       <form id="buy-form" class="space-y-4">
-        <div><label class="block text-sm font-medium">What is your required total wattage?</label><input type="number"
-            placeholder="e.g., 5000 W" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        <div><label class="block text-sm font-medium">What is your required total wattage?</label>
+          <input type="number" name="wattage"
+            placeholder="Required Wattage (W)" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
         </div>
-        <div><label class="block text-sm font-medium">What is your budget ($)?</label><input type="number"
-            placeholder="e.g., 2000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        <div><label class="block text-sm font-medium">What is your budget (₹)?</label>
+          <input type="number" name="budget"
+            placeholder="Budget (₹)" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
         </div>
-        <div><label class="block text-sm font-medium">Any specific brand or type preference?</label><input type="text"
-            placeholder="e.g., Canadian Solar, Bifacial"
+        <div><label class="block text-sm font-medium">Any specific brand or type preference?</label>
+          <input type="text" name="preference"
+            placeholder="Brand Preference (optional)"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"></div><button type="submit"
           class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Find a Match</button>
       </form>

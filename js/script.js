@@ -313,111 +313,103 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // --- Sell Panel Form Submission ---
     const sellForm = document.getElementById('sell-form');
     if (sellForm) {
       sellForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
         if (!currentUser) {
           alert('Please sign in before submitting!');
-          openModal('authModal');
+          openModal(authModal);
           return;
         }
 
-        // Collect form fields (adjust IDs if different)
-        const purchaseDate = sellForm.querySelector('input[type=date]').value;
-        const sellerName = sellForm.querySelector('input[type=text]').value; // match to correct seller field
-        const panelParams = sellForm.querySelectorAll('input[type=text]')[1].value; // second text input for params
+        // Collect form fields
+        const purchaseDate = sellForm.querySelector('input[type="date"]').value;
+        const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value; // Add name attribute
+        const panelParams = sellForm.querySelector('input[name="panel-params"]').value; // Add name attribute
         const sellReceiptFile = document.getElementById('sell-receipt').files[0];
         const sellImageFile = document.getElementById('sell-image').files[0];
 
-        let receiptUrl = '';
-        let imageUrl = '';
+        let receiptImageURL = '';
+        let panelImageURL = '';
         const storageRef = firebase.storage().ref();
 
-        // Upload panel image (required)
-        if (sellImageFile) {
-          const imgSnap = await storageRef.child(`sellerQueries/${currentUser.uid}/${Date.now()}-panel`).put(sellImageFile);
-          imageUrl = await imgSnap.ref.getDownloadURL();
-        }
+        try {
+          // Upload panel image (required)
+          if (sellImageFile) {
+            const imgSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-panel`).put(sellImageFile);
+            panelImageURL = await imgSnap.ref.getDownloadURL();
+          }
 
-        // Upload receipt if provided (optional)
-        if (sellReceiptFile) {
-          const receiptSnap = await storageRef.child(`sellerQueries/${currentUser.uid}/${Date.now()}-receipt`).put(sellReceiptFile);
-          receiptUrl = await receiptSnap.ref.getDownloadURL();
-        }
+          // Upload receipt if provided (optional)
+          if (sellReceiptFile) {
+            const receiptSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-receipt`).put(sellReceiptFile);
+            receiptImageURL = await receiptSnap.ref.getDownloadURL();
+          }
 
-        db.collection('sellerQueries').add({
-          userId: currentUser.uid,
-          userPhone: currentUser.phoneNumber || '',
-          purchaseDate,
-          sellerName,
-          panelParams,
-          imageUrl,
-          receiptUrl,
-          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert('Sell request submitted!');
+          // Add to sellQueries collection with correct field names
+          await db.collection('sellQueries').add({
+            sellerID: currentUser.uid,
+            sellerPhone: currentUser.phoneNumber || 'N/A',
+            purchaseDate: purchaseDate,
+            purchasedFrom: purchasedFrom,
+            panelParams: panelParams,
+            panelImageURL: panelImageURL,
+            receiptImageURL: receiptImageURL,
+            status: 'pending', // pending, approved, rejected
+            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          alert('Sell request submitted successfully!');
           sellForm.reset();
           closeModal(document.getElementById('sellPanelModal'));
-        }).catch(error => {
+        } catch (error) {
           alert('Error submitting request.');
           console.error(error);
-        });
+        }
       });
     }
 
-const buyForm = document.getElementById('buy-form');
-if (buyForm) {
-  buyForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!currentUser) {
-      alert('Please sign in before submitting!');
-      openModal('authModal');
-      return;
-    }
+    // --- Buy Request Form Submission ---
+    const buyForm = document.getElementById('buy-form');
+    if (buyForm) {
+      buyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // Collect form input values
-    const wattage = buyForm.querySelectorAll('input[type=number]')[0].value;
-    const budget = buyForm.querySelectorAll('input[type=number]')[1].value;
-    const brand = buyForm.querySelector('input[type=text]').value;
+        if (!currentUser) {
+          alert('Please sign in before submitting!');
+          openModal(authModal);
+          return;
+        }
 
-    try {
-      // Add the buyer query initially with status "searching"
-      const docRef = await db.collection('buyQueries').add({
-        userId: currentUser.uid,
-        wattage,
-        budget,
-        brand,
-        status: 'searching',
-        submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        // Collect form input values
+        const requiredWattage = buyForm.querySelector('input[name="wattage"]').value; // Add name attribute
+        const budget = buyForm.querySelector('input[name="budget"]').value; // Add name attribute
+        const preference = buyForm.querySelector('input[name="preference"]').value; // Add name attribute
+
+        try {
+          // Add the buyer query to buyQueries collection
+          await db.collection('buyQueries').add({
+            buyerID: currentUser.uid,
+            buyerPhone: currentUser.phoneNumber || 'N/A',
+            requiredWattage: parseInt(requiredWattage),
+            budget: parseFloat(budget),
+            preference: preference,
+            status: 'searching', // searching, found, completed
+            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          alert('Buy request submitted! We will notify you when matches are found.');
+          buyForm.reset();
+          closeModal(document.getElementById('buyRequestModal'));
+        } catch (error) {
+          console.error('Error processing buy request:', error);
+          alert('Error occurred while processing your request.');
+        }
       });
-
-      // Prepare query to find matches
-      let query = db.collection('buyQueries');
-      if (wattage) query = query.where('wattage', '==', wattage);
-      if (budget) query = query.where('budget', '==', budget);
-      if (brand) query = query.where('brand', '==', brand);
-
-      const snapshot = await query.get();
-
-      if (snapshot.empty) {
-        alert('No matching buyers found.');
-        // Status remains "searching"
-      } else {
-        alert(`${snapshot.size} matches found!`);
-        // Update status to "found" for this buyer query document
-        await docRef.update({ status: 'found' });
-      }
-
-      buyForm.reset();
-      closeModal(document.getElementById('buyRequestModal'));
-
-    } catch (error) {
-      console.error('Error processing buy request:', error);
-      alert('Error occurred while processing your request.');
     }
-  });
-}
 
     // --- Sticky Header on Scroll ---
     const header = document.getElementById('header');
@@ -539,42 +531,51 @@ if (buyForm) {
           // Phase 1: Send OTP
           clearRecaptcha();
           window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-signup', {
-            'size': 'invisible'
+            size: 'invisible'
           });
-          const phoneNumber = document.getElementById('signup-phone').value;
 
+          const phoneNumber = document.getElementById('signup-phone').value;
           auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
-            .then(confirmationResult => {
+            .then((confirmationResult) => {
               window.confirmationResult = confirmationResult;
               document.getElementById('signup-details-section').classList.add('hidden');
               document.getElementById('signup-otp-section').classList.remove('hidden');
               signupButton.textContent = 'Create Account';
               alert('OTP sent successfully!');
-            }).catch(error => alert("Sign up failed: " + error.message));
+            })
+            .catch((error) => {
+              alert('Sign up failed: ' + error.message);
+            });
         } else {
           // Phase 2: Verify OTP and Create Profile
           const otp = document.getElementById('signup-otp').value;
           if (!otp) {
-            alert("Please enter the OTP.");
+            alert('Please enter the OTP.');
             return;
           }
-          window.confirmationResult.confirm(otp).then(result => {
-            const user = result.user;
-            const name = document.getElementById('signup-name').value;
-            const address = document.getElementById('signup-address').value;
 
-            // Save user info to Firestore
-            return db.collection('users').doc(user.uid).set({
-              name: name,
-              address: address,
-              phoneNumber: user.phoneNumber,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          window.confirmationResult.confirm(otp)
+            .then((result) => {
+              const user = result.user;
+              const name = document.getElementById('signup-name').value;
+              const address = document.getElementById('signup-address').value;
+
+              // Save user info to 'users' collection with correct fields
+              return db.collection('users').doc(user.uid).set({
+                name: name,
+                address: address,
+                phone: user.phoneNumber,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            })
+            .then(() => {
+              alert('Account created successfully!');
+              closeModal(authModal);
+              resetAuthForms();
+            })
+            .catch((error) => {
+              alert('Account creation failed: ' + error.message);
             });
-          }).then(() => {
-            alert("Account created successfully!");
-            closeModal(authModal);
-            resetAuthForms();
-          }).catch(error => alert("Account creation failed: " + error.message));
         }
       });
     }
