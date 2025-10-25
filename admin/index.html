@@ -149,70 +149,14 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <section id="seller-queries">
           <h2 class="text-2xl font-semibold mb-6 text-gray-700">Pending Seller Verifications</h2>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b">
-                <tr>
-                  <th class="p-4 font-semibold">Seller</th>
-                  <th class="p-4 font-semibold">Panel Type</th>
-                  <th class="p-4 font-semibold">Date</th>
-                  <th class="p-4 font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b">
-                  <td class="p-4">Arjun Sharma</td>
-                  <td class="p-4">380W Bifacial</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
-                  <td class="p-4"><button data-modal-target="sellerQueryModal1"
-                      class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View
-                      Details</button></td>
-                </tr>
-                <tr class="border-b">
-                  <td class="p-4">Priya Patel</td>
-                  <td class="p-4">350W Monocrystalline</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-24</td>
-                  <td class="p-4"><button data-modal-target="sellerQueryModal1"
-                      class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View
-                      Details</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div id="pending-seller-verifications" class="space-y-4">
+            </div>
         </section>
 
         <section id="buyer-queries">
           <h2 class="text-2xl font-semibold mb-6 text-gray-700">Buyer Inquiries</h2>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b">
-                <tr>
-                  <th class="p-4 font-semibold">Buyer</th>
-                  <th class="p-4 font-semibold">Inquiry Type</th>
-                  <th class="p-4 font-semibold">Date</th>
-                  <th class="p-4 font-semibold">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b">
-                  <td class="p-4">Rohan Mehta</td>
-                  <td class="p-4">General Requirement</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-26</td>
-                  <td class="p-4"><button data-modal-target="buyerQueryModal1"
-                      class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button>
-                  </td>
-                </tr>
-                <tr class="border-b">
-                  <td class="p-4">Sunita Singh</td>
-                  <td class="p-4">Specific Panel Interest</td>
-                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
-                  <td class="p-4"><button data-modal-target="buyerQueryModal2"
-                      class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div id="pending-buyer-queries" class="space-y-4">
+            </div>
         </section>
       </div>
 

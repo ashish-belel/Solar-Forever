@@ -6,6 +6,46 @@ document.addEventListener('DOMContentLoaded', function () {
   const logoutBtn = document.getElementById('admin-logout-btn');
   const confirmationMessage = document.getElementById('confirmation-message');
 
+  // --- Generic Modal Handlers (for static modals) ---
+  function setupStaticModals() {
+    // Open Modals
+    document.querySelectorAll('[data-modal-target]').forEach(button => {
+      button.addEventListener('click', () => {
+        const modalId = button.getAttribute('data-modal-target');
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex'); // Use flex for centering
+        }
+      });
+    });
+
+    // Close Modals
+    document.querySelectorAll('[data-modal-close]').forEach(button => {
+      button.addEventListener('click', () => {
+        const modalId = button.getAttribute('data-modal-close');
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    });
+
+    // Close on backdrop click
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    });
+  }
+  
+  // Run the modal setup
+  setupStaticModals();
+  
   // Firebase references
   const db = firebase.firestore();
   const auth = firebase.auth();
