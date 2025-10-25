@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // Run the modal setup
   setupStaticModals();
-  
+
   // Firebase references
   const db = firebase.firestore();
   const auth = firebase.auth();
@@ -103,10 +103,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Load Pending Seller Verifications from sellQueries ---
+// --- Load Pending Seller Verifications from sellQueries ---
   async function loadPendingSellerVerifications() {
-    const container = document.getElementById('pending-seller-verifications');
-    if (!container) return;
+    // MODIFIED: Target the new tbody ID
+    const tbody = document.getElementById('seller-queries-tbody');
+    if (!tbody) return;
 
     try {
       const snapshot = await db.collection('sellQueries')
@@ -114,55 +115,53 @@ document.addEventListener('DOMContentLoaded', function () {
         .orderBy('submittedAt', 'desc')
         .get();
 
-      container.innerHTML = '';
+      tbody.innerHTML = ''; // Clear old rows
 
       if (snapshot.empty) {
-        container.innerHTML = '<p class="text-gray-600">No pending seller verifications.</p>';
+        // MODIFIED: Show message in a table row
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending seller verifications.</td></tr>';
         return;
       }
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        const card = createSellerVerificationCard(doc.id, data);
-        container.appendChild(card);
+        // MODIFIED: Create a row instead of a card
+        const row = createSellerVerificationRow(doc.id, data);
+        tbody.appendChild(row);
       });
     } catch (error) {
       console.error('Error loading seller verifications:', error);
-      container.innerHTML = '<p class="text-red-600">Error loading data.</p>';
+      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
     }
   }
 
-  // --- Create Seller Verification Card ---
-  function createSellerVerificationCard(docId, data) {
-    const card = document.createElement('div');
-    card.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200';
+  // --- MODIFIED: Create Seller Verification ROW ---
+  function createSellerVerificationRow(docId, data) {
+    // MODIFIED: Create a <tr> element
+    const row = document.createElement('tr');
+    row.className = 'border-b hover:bg-gray-50';
     
-    card.innerHTML = `
-      <div class="flex justify-between items-start mb-2">
-        <div>
-          <h4 class="font-bold text-gray-800">${data.panelParams || 'N/A'}</h4>
-          <p class="text-sm text-gray-600">Seller ID: ${data.sellerID}</p>
-          <p class="text-sm text-gray-600">Phone: ${data.sellerPhone}</p>
-          <p class="text-sm text-gray-600">Purchase Date: ${data.purchaseDate || 'N/A'}</p>
-          <p class="text-sm text-gray-600">Purchased From: ${data.purchasedFrom || 'N/A'}</p>
-        </div>
-        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
-          ${data.status}
-        </span>
-      </div>
-      <button 
-        class="view-details-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-2"
-        data-doc-id="${docId}">
-        View Details
-      </button>
+    // Format the date, or show N/A
+    const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
+
+    // MODIFIED: Use <td> table cell markup
+    row.innerHTML = `
+      <td class="p-4">${data.sellerPhone || 'N/A'}</td>
+      <td class="p-4">${data.panelParams || 'N/A'}</td>
+      <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
+      <td class="p-4">
+        <button class="view-details-btn bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">
+          View Details
+        </button>
+      </td>
     `;
 
-    // Add click listener to view details button
-    card.querySelector('.view-details-btn').addEventListener('click', () => {
-      showSellerVerificationModal(docId, data);
+    // Add click listener to view details button (this logic is the same)
+    row.querySelector('.view-details-btn').addEventListener('click', () => {
+      showSellerVerificationModal(docId, data); // This function (lines 132-211) is still correct
     });
 
-    return card;
+    return row;
   }
 
   // --- Show Seller Verification Modal (Similar to Landing Page) ---
@@ -294,10 +293,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // --- Load Pending Buyer Queries from buyQueries ---
+// --- Load Pending Buyer Queries from buyQueries ---
   async function loadPendingBuyerQueries() {
-    const container = document.getElementById('pending-buyer-queries');
-    if (!container) return;
+    // MODIFIED: Target the new tbody ID
+    const tbody = document.getElementById('buyer-queries-tbody');
+    if (!tbody) return;
 
     try {
       const snapshot = await db.collection('buyQueries')
@@ -305,39 +305,106 @@ document.addEventListener('DOMContentLoaded', function () {
         .orderBy('submittedAt', 'desc')
         .get();
 
-      container.innerHTML = '';
+      tbody.innerHTML = ''; // Clear old rows
 
       if (snapshot.empty) {
-        container.innerHTML = '<p class="text-gray-600">No pending buyer queries.</p>';
+        // MODIFIED: Show message in a table row
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending buyer queries.</td></tr>';
         return;
       }
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        const card = document.createElement('div');
-        card.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200';
+        // MODIFIED: Create a <tr> element
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50';
         
-        card.innerHTML = `
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm text-gray-600">Buyer ID: ${data.buyerID}</p>
-              <p class="text-sm text-gray-600">Phone: ${data.buyerPhone}</p>
-              <p class="text-sm text-gray-600">Wattage: ${data.requiredWattage}W</p>
-              <p class="text-sm text-gray-600">Budget: ₹${data.budget}</p>
-              <p class="text-sm text-gray-600">Preference: ${data.preference || 'None'}</p>
-            </div>
-            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
-              ${data.status}
-            </span>
-          </div>
+        const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
+
+        // MODIFIED: Use <td> table cell markup
+        row.innerHTML = `
+          <td class="p-4">${data.buyerPhone || 'N/A'}</td>
+          <td class="p-4">${data.requiredWattage || 'N/A'}W / ₹${data.budget || 'N/A'}</td>
+          <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
+          <td class="p-4">
+            <button class="view-details-btn bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">
+              View
+            </button>
+          </td>
         `;
         
-        container.appendChild(card);
+        // MODIFIED: Add a click listener to open a dynamic modal
+        row.querySelector('.view-details-btn').addEventListener('click', () => {
+          showBuyerQueryModal(doc.id, data);
+        });
+
+        tbody.appendChild(row);
       });
     } catch (error) {
       console.error('Error loading buyer queries:', error);
-      container.innerHTML = '<p class="text-red-600">Error loading data.</p>';
+      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
     }
+  }
+
+  // --- NEW: Show Buyer Query Modal ---
+  function showBuyerQueryModal(docId, data) {
+    // Check if a modal already exists, if not, create it
+    let modal = document.getElementById('buyerQueryModal');
+    
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'buyerQueryModal';
+      modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
+      
+      modal.innerHTML = `
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
+          <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-xl font-bold">Buyer Inquiry Details</h3>
+            <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+          </div>
+          <div class="p-6 space-y-3">
+            <h4 class="font-semibold text-lg border-b pb-2">Buyer Information</h4>
+            <p><strong>Buyer ID:</strong> <span id="modal-buyer-id"></span></p>
+            <p><strong>Phone:</strong> <span id="modal-buyer-phone"></span></p>
+            <hr>
+            <h4 class="font-semibold text-lg pt-2">Requirements</h4>
+            <p><strong>Required Wattage:</strong> <span id="modal-buyer-wattage"></span> W</p>
+            <p><strong>Budget:</strong> ₹<span id="modal-buyer-budget"></span></p>
+            <p><strong>Preference:</strong> <span id="modal-buyer-preference"></span></p>
+          </div>
+          <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
+            <button class="close-modal-btn bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Add close listeners ONCE when modal is created
+      modal.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        });
+      });
+      
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    }
+    
+    // Populate modal with specific data for THIS row
+    document.getElementById('modal-buyer-id').textContent = data.buyerID || 'N/A';
+    document.getElementById('modal-buyer-phone').textContent = data.buyerPhone || 'N/A';
+    document.getElementById('modal-buyer-wattage').textContent = data.requiredWattage || 'N/A';
+    document.getElementById('modal-buyer-budget').textContent = data.budget || 'N/A';
+    document.getElementById('modal-buyer-preference').textContent = data.preference || 'N/A';
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
   }
 
   // --- Load Marketplace Panels (if you have a marketplace collection) ---

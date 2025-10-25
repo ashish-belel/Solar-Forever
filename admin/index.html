@@ -149,14 +149,38 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <section id="seller-queries">
           <h2 class="text-2xl font-semibold mb-6 text-gray-700">Pending Seller Verifications</h2>
-          <div id="pending-seller-verifications" class="space-y-4">
-            </div>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="p-4 font-semibold">Seller Phone</th>
+                  <th class="p-4 font-semibold">Panel Type</th>
+                  <th class="p-4 font-semibold">Date Submitted</th>
+                  <th class="p-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody id="seller-queries-tbody">
+                </tbody>
+            </table>
+          </div>
         </section>
 
         <section id="buyer-queries">
           <h2 class="text-2xl font-semibold mb-6 text-gray-700">Buyer Inquiries</h2>
-          <div id="pending-buyer-queries" class="space-y-4">
-            </div>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="p-4 font-semibold">Buyer Phone</th>
+                  <th class="p-4 font-semibold">Requirement (W / Budget)</th>
+                  <th class="p-4 font-semibold">Date Submitted</th>
+                  <th class="p-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody id="buyer-queries-tbody">
+                </tbody>
+            </table>
+          </div>
         </section>
       </div>
 
