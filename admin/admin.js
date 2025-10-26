@@ -493,17 +493,17 @@ document.addEventListener('DOMContentLoaded', function () {
     modal.classList.add('flex');
   }
 
-  // --- Load Marketplace Panels (UPDATED) ---
+  // --- Load Marketplace Panels (UPDATED to show 8 by default) ---
   async function loadMarketplacePanels() {
     const container = document.getElementById('marketplace-grid');
     if (!container) return;
 
-    // Map to store data for event delegation
     const panelDataMap = new Map();
+    let itemCounter = 0; // <-- Counter
+    let toggleBtn = null; // <-- Button reference
 
     try {
       const snapshot = await db.collection('sellQueries')
-        // Load items that are 'pending' OR 'approved'
         .where('status', 'in', ['pending', 'approved'])
         .orderBy('submittedAt', 'desc')
         .get();
@@ -516,21 +516,54 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       snapshot.forEach((doc) => {
+        itemCounter++; // <-- Increment counter
         const data = doc.data();
-        panelDataMap.set(doc.id, data); // Store data for the listener
+        panelDataMap.set(doc.id, data);
         const card = createMarketplaceCard(doc.id, data);
+
+        // --- NEW: Logic to hide extra items ---
+        if (itemCounter > 8) { // <-- CHANGED FROM 6
+          card.classList.add('hidden', 'admin-marketplace-extra');
+        }
+        // --- End new logic ---
+
         container.appendChild(card);
       });
 
-      // --- Event Listener for new buttons ---
-      // We use event delegation, just like for the tables
+      // --- NEW: Add the "Show More" button if needed ---
+      if (itemCounter > 8) { // <-- CHANGED FROM 6
+        toggleBtn = document.createElement('button');
+        toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
+        toggleBtn.className = 'w-full bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-300 transition-colors mt-4 col-span-full';
+        toggleBtn.dataset.state = 'more';
+
+        container.appendChild(toggleBtn);
+
+        // Add click listener for the new button
+        toggleBtn.addEventListener('click', () => {
+          const extraItems = container.querySelectorAll('.admin-marketplace-extra');
+
+          if (toggleBtn.dataset.state === 'more') {
+            extraItems.forEach(item => item.classList.remove('hidden'));
+            toggleBtn.textContent = 'Show Less';
+            toggleBtn.dataset.state = 'less';
+          } else {
+            extraItems.forEach(item => item.classList.add('hidden'));
+            toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
+            toggleBtn.dataset.state = 'more';
+          }
+        });
+      }
+      // --- End new button logic ---
+
+
+      // --- Event Listener for new buttons (This is the same as before) ---
       container.addEventListener('click', (e) => {
         const button = e.target.closest('.view-marketplace-btn');
         if (button) {
           const docId = button.dataset.docId;
           const data = panelDataMap.get(docId);
           if (data) {
-            // We use the SAME seller modal. It has all the info.
             showSellerVerificationModal(docId, data);
           }
         }

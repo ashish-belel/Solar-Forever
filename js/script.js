@@ -173,8 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
       };
 
-      // --- NEW: Function to load the marketplace ---
+      // --- NEW: Function to load the marketplace (UPDATED to show 8 by default) ---
       const loadMarketplace = async () => {
+        let itemCounter = 0; // Counter
+        let toggleBtn = null; // Button reference
+
         try {
           const snapshot = await db.collection('sellQueries')
             .where('status', '==', 'approved')
@@ -184,20 +187,53 @@ document.addEventListener('DOMContentLoaded', () => {
           marketplaceGrid.innerHTML = ''; // Clear static cards
 
           if (snapshot.empty) {
-            marketplaceGrid.innerHTML = '<p>No panels available right now. Check back soon!</p>';
+            marketplaceGrid.innerHTML = '<p class="text-gray-600 col-span-full">No panels available right now. Check back soon!</p>';
             return;
           }
 
           snapshot.forEach(doc => {
+            itemCounter++; // Increment counter
             const data = doc.data();
-            panelDataMap.set(doc.id, data); // Save data for the click listener
+            panelDataMap.set(doc.id, data);
             const card = createMarketplaceCard(doc.id, data);
+
+            // Logic to hide extra items
+            if (itemCounter > 8) { // <-- CHANGED FROM 6
+              card.classList.add('hidden', 'user-marketplace-extra');
+            }
+
             marketplaceGrid.appendChild(card);
           });
 
+          // Add the "Show More" button if needed
+          if (itemCounter > 8) { // <-- CHANGED FROM 6
+            toggleBtn = document.createElement('button');
+            toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
+
+            toggleBtn.className = 'w-full bg-blue-100 text-blue-800 font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-blue-200 mt-8 col-span-full';
+            toggleBtn.dataset.state = 'more';
+
+            marketplaceGrid.appendChild(toggleBtn);
+
+            // Add click listener
+            toggleBtn.addEventListener('click', () => {
+              const extraItems = marketplaceGrid.querySelectorAll('.user-marketplace-extra');
+
+              if (toggleBtn.dataset.state === 'more') {
+                extraItems.forEach(item => item.classList.remove('hidden'));
+                toggleBtn.textContent = 'Show Less';
+                toggleBtn.dataset.state = 'less';
+              } else {
+                extraItems.forEach(item => item.classList.add('hidden'));
+                toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
+                toggleBtn.dataset.state = 'more';
+              }
+            });
+          }
+
         } catch (error) {
           console.error("Error loading marketplace:", error);
-          marketplaceGrid.innerHTML = '<p>Could not load marketplace. Please try again later.</p>';
+          marketplaceGrid.innerHTML = '<p class="text-red-600 col-span-full">Could not load marketplace. Please try again later.</p>';
         }
       };
 
