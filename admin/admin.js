@@ -408,16 +408,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-// --- NEW (Simplified): Mark a Panel as Sold ---
-  // This just updates the status to 'sold' to remove it from the UI.
+// --- UPDATED: Mark a Panel as Sold ---
+  // This moves the data to SoldSolar and removes it from the marketplace
   async function markPanelAsSold(docId, panelData) {
     try {
-      // 1. Update the original sellQuery status to 'sold'
+      // 1. Get Seller Info from 'users' collection
+      const sellerInfo = await fetchUserInfo(panelData.sellerID);
+
+      // 2. Create the new SoldSolar document
+      // NOTE: Using SoldSolar as requested.
+      await db.collection('SoldSolar').add({
+        panelInfo: panelData,
+        sellerInfo: sellerInfo || { uid: panelData.sellerID, phone: panelData.sellerPhone },
+        buyerInfo: {}, // No buyer info available from this button
+        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+        salePrice: null // No price available from this button
+      });
+      
+      // 3. Update the original sellQuery status to 'sold'
       await db.collection('sellQueries').doc(docId).update({
         status: 'sold'
       });
       
-      showConfirmation('Panel marked as sold and removed from marketplace.');
+      showConfirmation('Panel marked as sold and moved to SoldSolar.');
       loadMarketplacePanels(); // Reload the marketplace
 
     } catch (error) {
@@ -527,21 +540,21 @@ document.addEventListener('DOMContentLoaded', function () {
     return card;
   }
 
-  // --- NEW: Show Buyer Query Modal ---
+// --- UPDATED: Show Buyer Query Modal (with "Assign" button) ---
   function showBuyerQueryModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('buyerQueryModal');
-
+    
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'buyerQueryModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-
+      
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Buyer Inquiry Details</h3>
-            <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
           </div>
           <div class="p-6 space-y-3">
             <h4 class="font-semibold text-lg border-b pb-2">Buyer Information</h4>
@@ -553,13 +566,16 @@ document.addEventListener('DOMContentLoaded', function () {
             <p><strong>Budget:</strong> ₹<span id="modal-buyer-budget"></span></p>
             <p><strong>Preference:</strong> <span id="modal-buyer-preference"></span></p>
           </div>
-          <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
-            <button class="close-modal-btn bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
+          <div class="flex justify-end items-center p-4 bg-gray-50 border-t gap-3">
+            <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
+            <button id="assign-seller-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
+              Assign Seller
+            </button>
           </div>
         </div>
       `;
       document.body.appendChild(modal);
-
+      
       // Add close listeners ONCE when modal is created
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -567,7 +583,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-
+      
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           modal.classList.add('hidden');
@@ -575,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-
+    
     // Populate modal with specific data for THIS row
     document.getElementById('modal-buyer-id').textContent = data.buyerID || 'N/A';
     document.getElementById('modal-buyer-phone').textContent = data.buyerPhone || 'N/A';
@@ -583,6 +599,14 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('modal-buyer-budget').textContent = data.budget || 'N/A';
     document.getElementById('modal-buyer-preference').textContent = data.preference || 'N/A';
 
+    // --- NEW: Add .onclick listener for the "Assign" button ---
+    document.getElementById('assign-seller-btn').onclick = () => {
+      // Pass the buyer's query ID and data to the new modal
+      showAssignSellerModal(docId, data);
+      modal.classList.add('hidden'); // Hide this modal
+      modal.classList.remove('flex');
+    };
+    
     // Show modal
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -685,5 +709,174 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmationMessage.classList.add('hidden');
       }, 300);
     }, 3000);
+  }
+
+  // --- NEW: Function to open the "Assign Seller" modal ---
+  function showAssignSellerModal(buyerDocId, buyerData) {
+    // 1. Create the modal if it doesn't exist
+    let modal = document.getElementById('assignSellerModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'assignSellerModal';
+      modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
+      
+      modal.innerHTML = `
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-3xl transform">
+          <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-xl font-bold">Assign Seller to Buyer</h3>
+            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+          </div>
+          <div class="p-6 max-h-[70vh] overflow-y-auto">
+            <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 class="font-bold text-blue-800">Buyer's Request:</h4>
+              <p><strong>Wattage:</strong> ${buyerData.requiredWattage}W</p>
+              <p><strong>Budget:</strong> ₹${buyerData.budget}</p>
+              <p><strong>Phone:</strong> ${buyerData.buyerPhone}</p>
+            </div>
+            <h4 class="font-bold text-gray-800 mb-2">Select an Available Panel to Assign:</h4>
+            <div id="available-panels-list" class="space-y-3">
+              <p>Loading available panels...</p>
+            </div>
+          </div>
+          <div class="flex justify-end items-center p-4 bg-gray-50 border-t gap-3">
+            <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Cancel</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      // Add close listeners ONCE
+      modal.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        });
+      });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      });
+    }
+
+    // 2. Show the modal and load the panels
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    loadAvailablePanels(buyerDocId, buyerData); // Call the next function
+  }
+
+  // --- NEW: Function to load available panels into the "Assign" modal ---
+  async function loadAvailablePanels(buyerDocId, buyerData) {
+    const container = document.getElementById('available-panels-list');
+    if (!container) return;
+
+    // This map will store the data for each seller panel
+    const sellerPanelMap = new Map();
+
+    try {
+      // Find panels that are 'approved' and meet the buyer's wattage request
+      const snapshot = await db.collection('sellQueries')
+        .where('status', '==', 'approved')
+        // Optional: Filter by wattage. Remove this line if you want to see all panels.
+        // .where('panelParams', '>=', buyerData.requiredWattage + 'W') 
+        .get();
+      
+      container.innerHTML = ''; // Clear "Loading..."
+
+      if (snapshot.empty) {
+        container.innerHTML = '<p class="text-gray-600">No approved panels match this request.</p>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const sellerData = doc.data();
+        const sellerDocId = doc.id;
+        sellerPanelMap.set(sellerDocId, sellerData); // Store data
+
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-white border rounded-lg flex justify-between items-center';
+        card.innerHTML = `
+          <div>
+            <p class="font-bold">${sellerData.panelParams}</p>
+            <p class="text-sm text-gray-600">Seller Phone: ${sellerData.sellerPhone}</p>
+          </div>
+          <button class="assign-confirm-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700" data-seller-id="${sellerDocId}">
+            Assign
+          </button>
+        `;
+        container.appendChild(card);
+      });
+
+      // Add one listener to the container (Event Delegation)
+      container.addEventListener('click', async (e) => {
+        const button = e.target.closest('.assign-confirm-btn');
+        if (button) {
+          if (!confirm("Are you sure you want to assign this panel? This will complete the sale.")) {
+            return;
+          }
+          
+          const sellerDocId = button.dataset.sellerId;
+          const sellerData = sellerPanelMap.get(sellerDocId);
+          
+          if (sellerData) {
+            await confirmAssignment(buyerDocId, buyerData, sellerDocId, sellerData);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Error loading available panels:", error);
+      container.innerHTML = '<p class="text-red-600">Error loading panels.</p>';
+    }
+  }
+
+  // --- NEW: Function to finalize the assignment and save to SoldSolar ---
+  async function confirmAssignment(buyerDocId, buyerData, sellerDocId, sellerData) {
+    try {
+      // 1. Get full buyer and seller user info
+      const buyerInfo = await fetchUserInfo(buyerData.buyerID);
+      const sellerInfo = await fetchUserInfo(sellerData.sellerID);
+
+      // 2. Create the SoldSolar document
+      await db.collection('SoldSolar').add({
+        panelInfo: sellerData,
+        sellerInfo: sellerInfo || { uid: sellerData.sellerID, phone: sellerData.sellerPhone },
+        buyerInfo: {
+          ...buyerInfo,
+          uid: buyerData.buyerID,
+          phone: buyerData.buyerPhone,
+          requirements: {
+            budget: buyerData.budget,
+            preference: buyerData.preference,
+            wattage: buyerData.requiredWattage
+          }
+        },
+        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+        salePrice: null // You can add a field for this in the modal later
+      });
+
+      // 3. Update the buyerQuery status to 'completed'
+      await db.collection('buyQueries').doc(buyerDocId).update({
+        status: 'completed'
+      });
+
+      // 4. Update the sellQuery status to 'sold'
+      await db.collection('sellQueries').doc(sellerDocId).update({
+        status: 'sold'
+      });
+
+      // 5. Success!
+      showConfirmation('Sale completed and saved to SoldSolar!');
+      document.getElementById('assignSellerModal')?.classList.add('hidden'); // Close modal
+      
+      // Reload all lists
+      loadPendingBuyerQueries();
+      loadMarketplacePanels();
+
+    } catch (error) {
+      console.error("Error confirming assignment:", error);
+      alert("Error confirming assignment. Please try again.");
+    }
   }
 });
