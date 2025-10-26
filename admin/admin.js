@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-  // --- Show Seller Verification Modal (UPDATED with alignment fix) ---
+  // --- Show Seller Verification Modal (UPDATED with conditional buttons) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-xl font-bold">Seller Verification Details</h3>
+            <h3 class="text-xl font-bold">Panel Details</h3>
             <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
           </div>
 
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="space-y-2 text-gray-700">
               <p><span class="font-bold">Panel Parameters:</span> <span id="modal-panel-params"></span></p>
               <p><span class="font-bold">Seller ID:</span> <span id="modal-seller-id"></span></p>
-              <p><span class="font-bold">Seller Phone:</span> <span id="modal-seller-phone"></span></D>
+              <p><span class="font-bold">Seller Phone:</span> <span id="modal-seller-phone"></span></p>
               <p><span class="font-bold">Purchase Date:</span> <span id="modal-purchase-date"></span></p>
               <p><span class="font-bold">Purchased From:</span> <span id="modal-purchased-from"></span></p>
               <p><span class="font-bold">Status:</span> <span id="modal-status"></span></p>
@@ -226,22 +226,36 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
           </div>
           
-          <div class="flex justify-end items-center p-4 bg-gray-50 border-t gap-3">
-            <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
-              Close
-            </button>
-            <button id="disapprove-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
-              Disapprove Listing
-            </button>
-            <button id="approve-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
-              Approve Listing
-            </button>
+          <div class="p-4 bg-gray-50 border-t">
+            <div id="pending-actions" class="flex justify-end items-center gap-3">
+              <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
+                Close
+              </button>
+              <button id="disapprove-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
+                Disapprove Listing
+              </button>
+              <button id="approve-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
+                Approve Listing
+              </button>
+            </div>
+            
+            <div id="approved-actions" class="flex justify-end items-center gap-3">
+              <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
+                Close
+              </button>
+              <button id="delist-btn" class="bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-700">
+                De-list Panel
+              </button>
+              <button id="sold-btn" class="bg-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-700">
+                Mark as Sold
+              </button>
+            </div>
           </div>
         </div>
       `;
       document.body.appendChild(modal);
 
-      // Add close listeners ONCE when modal is created
+      // Add close listeners ONCE (applies to all buttons with this class)
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           modal.classList.add('hidden');
@@ -258,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // --- Populate modal with data (from original file) ---
+    // --- Populate modal with data ---
     document.getElementById('modal-panel-image').src = data.panelImageURL || '';
     document.getElementById('modal-panel-params').textContent = data.panelParams || 'N/A';
     document.getElementById('modal-seller-id').textContent = data.sellerID || 'N/A';
@@ -277,7 +291,26 @@ document.addEventListener('DOMContentLoaded', function () {
       receiptSection.classList.add('hidden');
     }
 
-    // --- Attach approve/disapprove listeners ---
+    // --- NEW: Show the correct set of buttons based on status ---
+    const pendingActions = document.getElementById('pending-actions');
+    const approvedActions = document.getElementById('approved-actions');
+
+    if (data.status === 'pending') {
+      pendingActions.classList.remove('hidden');
+      approvedActions.classList.add('hidden');
+    } else if (data.status === 'approved') {
+      approvedActions.classList.remove('hidden');
+      pendingActions.classList.add('hidden');
+    } else {
+      // For 'rejected' or 'sold' (if they are ever opened)
+      pendingActions.classList.add('hidden');
+      approvedActions.classList.add('hidden');
+    }
+
+    // --- Attach ALL button listeners ---
+    // We use .onclick to re-assign listeners every time
+
+    // Pending actions
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
@@ -286,6 +319,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('disapprove-btn').onclick = async () => {
       await disapproveSellerListing(docId);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
+
+    // Approved actions
+    document.getElementById('sold-btn').onclick = async () => {
+      await markPanelAsSold(docId, data);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
+
+    document.getElementById('delist-btn').onclick = async () => {
+      await deListPanel(docId);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
@@ -328,6 +374,69 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (error) {
       console.error('Error disapproving listing:', error);
       showConfirmation('Error disapproving listing.');
+    }
+  }
+
+  // --- NEW: Helper to fetch user data ---
+  async function fetchUserInfo(userId) {
+    if (!userId) return null;
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        return userDoc.data();
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      return null;
+    }
+  }
+
+  // --- NEW: De-list a Panel ---
+  // This will remove a panel from the marketplace
+  async function deListPanel(docId) {
+    try {
+      await db.collection('sellQueries').doc(docId).update({
+        status: 'rejected' // 'rejected' will hide it from all marketplaces
+      });
+
+      showConfirmation('Panel has been de-listed.');
+      loadPendingSellerVerifications(); // Reload the list
+      loadMarketplacePanels(); // Reload the marketplace
+    } catch (error) {
+      console.error('Error de-listing panel:', error);
+      showConfirmation('Error de-listing panel.');
+    }
+  }
+
+  // --- NEW: Mark a Panel as Sold ---
+  // This moves the data to SoldSolar and removes it from the marketplace
+  async function markPanelAsSold(docId, panelData) {
+    try {
+      // 1. Get Seller Info from 'users' collection
+      const sellerInfo = await fetchUserInfo(panelData.sellerID);
+
+      // 2. Create the new SoldSolar document
+      // We fill in what we can. buyerInfo and salePrice aren't known from this flow.
+      await db.collection('SoldSolar').add({
+        panelInfo: panelData,
+        sellerInfo: sellerInfo || { uid: panelData.sellerID, phone: panelData.sellerPhone },
+        buyerInfo: {}, // No buyer info available from this button
+        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
+        salePrice: null // No price available from this button
+      });
+
+      // 3. Update the original sellQuery status to 'sold'
+      await db.collection('sellQueries').doc(docId).update({
+        status: 'sold'
+      });
+
+      showConfirmation('Panel marked as sold and moved to SoldSolar.');
+      loadMarketplacePanels(); // Reload the marketplace
+
+    } catch (error) {
+      console.error('Error marking as sold:', error);
+      showConfirmation('Error marking panel as sold.');
     }
   }
 
