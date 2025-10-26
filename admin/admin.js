@@ -164,25 +164,27 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-  // --- Show Seller Verification Modal (Similar to Landing Page) ---
+// --- Show Seller Verification Modal (UPDATED) ---
   function showSellerVerificationModal(docId, data) {
-    // Create modal dynamically or use existing one
+    // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
     
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'sellerVerificationModal';
-      modal.className = 'modal-backdrop fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
+      modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
       
       modal.innerHTML = `
-        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl overflow-hidden">
-          <div class="p-6 max-h-96 overflow-y-auto relative">
-            <button class="close-modal-btn absolute top-4 right-4 text-2xl font-bold text-gray-600 hover:text-black">&times;</button>
-            
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Seller Verification Details</h3>
-            
-            <div class="mb-4">
-              <img id="modal-panel-image" src="" alt="Panel Image" class="w-full h-64 object-cover rounded-md mb-4">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+          <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-xl font-bold">Seller Verification Details</h3>
+            <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+          </div>
+
+          <div class="p-6 max-h-[60vh] overflow-y-auto space-y-4">
+            <div>
+              <p class="font-bold mb-2">Panel Image:</p>
+              <img id="modal-panel-image" src="" alt="Panel Image" class="w-full h-64 object-cover rounded-md mb-4 bg-gray-100">
             </div>
             
             <div class="space-y-2 text-gray-700">
@@ -196,37 +198,44 @@ document.addEventListener('DOMContentLoaded', function () {
             
             <div class="mt-4" id="receipt-section">
               <p class="font-bold mb-2">Receipt:</p>
-              <img id="modal-receipt-image" src="" alt="Receipt" class="w-full max-h-48 object-contain rounded-md">
+              <img id="modal-receipt-image" src="" alt="Receipt" class="w-full max-h-48 object-contain rounded-md bg-gray-100">
             </div>
           </div>
           
           <div class="flex justify-end items-center p-4 bg-gray-50 border-t gap-3">
-            <button id="disapprove-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700">
+            <button class="close-modal-btn bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
+              Close
+            </button>
+            <button id="disapprove-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
               Disapprove Listing
             </button>
-            <button id="approve-btn" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">
+            <button id="approve-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
               Approve Listing
             </button>
           </div>
         </div>
       `;
-      
       document.body.appendChild(modal);
       
-      // Close button
-      modal.querySelector('.close-modal-btn').addEventListener('click', () => {
-        modal.classList.add('hidden');
+      // Add close listeners ONCE when modal is created
+      // This will work for both the &times; and the 'Close' button
+      modal.querySelectorAll('.close-modal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        });
       });
       
-      // Close on backdrop click
+      // Add backdrop click listener ONCE
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           modal.classList.add('hidden');
+          modal.classList.remove('flex');
         }
       });
     }
     
-    // Populate modal with data
+    // --- Populate modal with data (from original file) ---
     document.getElementById('modal-panel-image').src = data.panelImageURL || '';
     document.getElementById('modal-panel-params').textContent = data.panelParams || 'N/A';
     document.getElementById('modal-seller-id').textContent = data.sellerID || 'N/A';
@@ -241,22 +250,28 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('modal-receipt-image').src = data.receiptImageURL;
       receiptSection.classList.remove('hidden');
     } else {
+      document.getElementById('modal-receipt-image').src = '';
       receiptSection.classList.add('hidden');
     }
     
-    // Approve button
+    // --- Attach approve/disapprove listeners ---
+    // We use .onclick here because it re-assigns the listener every time,
+    // ensuring the buttons are always linked to the correct (docId, data).
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
     };
     
-    // Disapprove button
     document.getElementById('disapprove-btn').onclick = async () => {
       await disapproveSellerListing(docId);
       modal.classList.add('hidden');
+      modal.classList.remove('flex');
     };
     
+    // --- Show modal ---
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
   }
 
   // --- Approve Seller Listing ---
