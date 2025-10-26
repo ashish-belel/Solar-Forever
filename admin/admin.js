@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-// --- Show Seller Verification Modal (UPDATED with De-list button) ---
+// --- Show Seller Verification Modal (UPDATED with hover effect) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
@@ -202,7 +202,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Panel Details</h3>
-            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            
+            <button class="close-modal-btn mt-0 text-gray-400 text-2xl font-bold rounded-full h-8 w-8 flex items-center justify-center leading-none transition-colors hover:bg-gray-700 hover:text-white">
+              &times;
+            </button>
+
           </div>
 
           <div class="p-6 max-h-[60vh] overflow-y-auto space-y-4">
@@ -328,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
       modal.classList.remove('flex');
     };
     
-    // THE "DE-LIST" LISTENER IS BACK
     document.getElementById('delist-btn').onclick = async () => {
       await deListPanel(docId);
       modal.classList.add('hidden');
@@ -540,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return card;
   }
 
-// --- UPDATED: Show Buyer Query Modal (with "Assign" button) ---
+// --- UPDATED: Show Buyer Query Modal (with hover effect) ---
   function showBuyerQueryModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('buyerQueryModal');
@@ -554,7 +557,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Buyer Inquiry Details</h3>
-            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+
+            <button class="close-modal-btn mt-0 text-gray-400 text-2xl font-bold rounded-full h-8 w-8 flex items-center justify-center leading-none transition-colors hover:bg-gray-700 hover:text-white">
+              &times;
+            </button>
+
           </div>
           <div class="p-6 space-y-3">
             <h4 class="font-semibold text-lg border-b pb-2">Buyer Information</h4>
@@ -711,7 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 3000);
   }
 
-  // --- NEW: Function to open the "Assign Seller" modal ---
+// --- NEW: Function to open the "Assign Seller" modal (UPDATED with hover effect) ---
   function showAssignSellerModal(buyerDocId, buyerData) {
     // 1. Create the modal if it doesn't exist
     let modal = document.getElementById('assignSellerModal');
@@ -724,7 +731,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-3xl transform">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Assign Seller to Buyer</h3>
-            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+
+            <button class="close-modal-btn mt-0 text-gray-400 text-2xl font-bold rounded-full h-8 w-8 flex items-center justify-center leading-none transition-colors hover:bg-gray-700 hover:text-white">
+              &times;
+            </button>
+
           </div>
           <div class="p-6 max-h-[70vh] overflow-y-auto">
             <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
