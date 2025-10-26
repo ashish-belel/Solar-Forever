@@ -103,11 +103,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-// --- Load Pending Seller Verifications from sellQueries ---
+// --- Load Pending Seller Verifications (UPDATED with Event Delegation) ---
   async function loadPendingSellerVerifications() {
-    // MODIFIED: Target the new tbody ID
     const tbody = document.getElementById('seller-queries-tbody');
     if (!tbody) return;
+
+    // We need a way to link the clicked button back to its data
+    const sellerDataMap = new Map();
 
     try {
       const snapshot = await db.collection('sellQueries')
@@ -118,24 +120,47 @@ document.addEventListener('DOMContentLoaded', function () {
       tbody.innerHTML = ''; // Clear old rows
 
       if (snapshot.empty) {
-        // MODIFIED: Show message in a table row
         tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending seller verifications.</td></tr>';
         return;
       }
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        // MODIFIED: Create a row instead of a card
+        
+        // Store the data in our map using the doc ID as the key
+        sellerDataMap.set(doc.id, data);
+        
         const row = createSellerVerificationRow(doc.id, data);
         tbody.appendChild(row);
       });
+
+      // --- NEW: Add ONE listener to the entire table body ---
+      tbody.addEventListener('click', (event) => {
+        // Check if the clicked element is our button
+        const button = event.target.closest('.view-details-btn');
+        
+        if (button) {
+          // Get the ID we stored on the button
+          const docId = button.dataset.docId;
+          
+          // Get the data from our map
+          const data = sellerDataMap.get(docId);
+          
+          if (data) {
+            // It works! Open the modal.
+            showSellerVerificationModal(docId, data);
+          }
+        }
+      });
+      // --- End of new listener ---
+
     } catch (error) {
       console.error('Error loading seller verifications:', error);
       tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
     }
   }
 
-  // --- MODIFIED: Create Seller Verification ROW ---
+// --- MODIFIED: Create Seller Verification ROW ---
   function createSellerVerificationRow(docId, data) {
     // MODIFIED: Create a <tr> element
     const row = document.createElement('tr');
@@ -150,16 +175,15 @@ document.addEventListener('DOMContentLoaded', function () {
       <td class="p-4">${data.panelParams || 'N/A'}</td>
       <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
       <td class="p-4">
-        <button class="view-details-btn bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">
+        <button 
+          class="view-details-btn bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200"
+          data-doc-id="${docId}">
           View Details
         </button>
       </td>
     `;
 
-    // Add click listener to view details button (this logic is the same)
-    row.querySelector('.view-details-btn').addEventListener('click', () => {
-      showSellerVerificationModal(docId, data); // This function (lines 132-211) is still correct
-    });
+    // CHANGE: The addEventListener was REMOVED from here
 
     return row;
   }
