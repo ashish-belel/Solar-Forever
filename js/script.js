@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage(); // Make sure storage is initialized
 
     // --- Global State & UI References ---
     let currentUser = null;
@@ -30,22 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // PART 1: MODAL AND UI LOGIC
     // =================================================================
 
-    // --- Modal Helper Functions --- (*** THIS IS THE CORRECTED PART ***)
-    // --- Modal Helper Functions (UPDATED) ---
+    // --- Modal Helper Functions ---
     const openModal = (modalId) => {
       const modal = document.getElementById(modalId);
       if (modal) {
-        // Instead of changing display, add the 'active' class
         modal.classList.add('active');
-        document.body.classList.add('modal-open'); // Add class to body
+        document.body.classList.add('modal-open');
       }
     };
 
     const closeModal = (modal) => {
       if (modal) {
-        // Instead of changing display, remove the 'active' class
         modal.classList.remove('active');
-        document.body.classList.remove('modal-open'); // Remove class from body
+        document.body.classList.remove('modal-open');
       }
     };
 
@@ -54,10 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginSignupBtn) {
       loginSignupBtn.addEventListener('click', () => {
         if (currentUser) {
-          // If user is logged in, log them out
           auth.signOut();
         } else {
-          // If user is logged out, show login modal
           openModal('authModal');
           resetAuthForms();
         }
@@ -69,14 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     getStartedBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         openModal('buyOrSellModal');
-        /*if (currentUser) {
-          // User is logged in → show buy/sell modal
-          openModal('buyOrSellModal');
-        } else {
-          // User not logged in → open login modal
-          openModal('authModal');
-          resetAuthForms();
-        }*/
       });
     });
 
@@ -85,74 +73,184 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginSignupBtnMobile) {
       loginSignupBtnMobile.addEventListener('click', () => {
         if (currentUser) {
-          // If user is logged in, log them out
           auth.signOut();
         } else {
-          // If user is logged out, show login modal
           openModal('authModal');
           resetAuthForms();
         }
       });
     }
 
-    // --- "View Details" Buttons in Marketplace ---
-    const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
-    viewDetailsBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        /*
-        // --- ADDED: Auth check for viewing details ---
-        if (!currentUser) {
-          alert("Please log in or sign up to view product details.");
-          openModal('authModal');
-          resetAuthForms();
-          return; // Stop execution
+    // --- (REPLACED) "View Details" Buttons in Marketplace ---
+    // Uses Event Delegation to work on dynamic content
+    const marketplaceGrid = document.getElementById('marketplace-grid');
+    if (marketplaceGrid) {
+      // Map to store data for each card
+      const panelDataMap = new Map();
+
+      // Listen for clicks on the whole grid
+      marketplaceGrid.addEventListener('click', (e) => {
+        const button = e.target.closest('.view-details-btn');
+        if (button) {
+          const docId = button.dataset.docId;
+          const data = panelDataMap.get(docId);
+
+          if (data) {
+            // Populate and open the modal
+            openModal('productDetailModal');
+            document.getElementById('modal-product-img').src = data.panelImageURL || '';
+            document.getElementById('modal-product-title').textContent = data.panelParams || 'N/A';
+            document.getElementById('modal-product-price').textContent = 'Price on request'; // You can add price to sellQueries later
+
+            // This hidden span now stores the all-important docId
+            document.getElementById('modal-product-id').textContent = docId;
+
+            // --- Age Logic ---
+            let ageText = 'N/A';
+            if (data.purchaseDate) {
+              try {
+                const purchaseYear = new Date(data.purchaseDate).getFullYear();
+                const currentYear = new Date().getFullYear();
+                const age = currentYear - purchaseYear;
+                if (age === 0) ageText = "(< 1 year old)";
+                else if (age === 1) ageText = "(1 year old)";
+                else ageText = `(${age} years old)`;
+              } catch (e) { /* ignore */ }
+            }
+            document.getElementById('modal-product-condition').textContent = `Condition: Excellent ${ageText}`;
+
+            try {
+              document.getElementById('modal-product-wattage').textContent = data.panelParams.split('W')[0] + 'W';
+              document.getElementById('modal-product-age').textContent = ageText.match(/\(([^)]+)\)/)[1];
+            } catch (err) { /* ignore if parsing fails */ }
+            document.getElementById('modal-product-status').textContent = "Expert Verified";
+          }
         }
-        // --- END ADDED BLOCK ---
-        */
-        openModal('productDetailModal');
-        const card = e.target.closest('.group');
-        const title = card.querySelector('h3').textContent;
-        const condition = card.querySelector('.text-gray-600').textContent;
-        const price = card.querySelector('.text-blue-700').textContent;
-        const imgSrc = card.querySelector('img').src;
-
-        document.getElementById('modal-product-img').src = imgSrc;
-        document.getElementById('modal-product-title').textContent = title;
-        document.getElementById('modal-product-condition').textContent = condition;
-        document.getElementById('modal-product-price').textContent = price;
-        try {
-          document.getElementById('modal-product-wattage').textContent = title.split('W')[0] + 'W';
-          document.getElementById('modal-product-age').textContent = condition.match(/\(([^)]+)\)/)[1];
-        } catch (err) { /* ignore if parsing fails */ }
-        document.getElementById('modal-product-status').textContent = "Expert Verified";
       });
-    });
 
-    // --- "Interested?" Button (inside Product Detail Modal) ---
+      // --- NEW: Helper function to create a card ---
+      const createMarketplaceCard = (docId, data) => {
+        const card = document.createElement('div');
+        card.className = "group bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col";
+
+        let ageText = '';
+        if (data.purchaseDate) {
+          try {
+            const purchaseYear = new Date(data.purchaseDate).getFullYear();
+            const currentYear = new Date().getFullYear();
+            const age = currentYear - purchaseYear;
+            if (age === 0) ageText = "(< 1 year old)";
+            else if (age === 1) ageText = "(1 year old)";
+            else ageText = `(${age} years old)`;
+          } catch (e) { /* ignore */ }
+        }
+
+        card.innerHTML = `
+          <div class="relative overflow-hidden h-56">
+            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                 src="${data.panelImageURL || 'https://via.placeholder.com/400x300.png?text=No+Image'}" alt="Solar Panel">
+            <div class="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+              Expert Verified
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col">
+            <h3 class="text-xl font-bold text-gray-800 mb-2">${data.panelParams || 'N/A'}</h3>
+            <p class="text-gray-600 text-sm mb-4">
+              Condition: Excellent ${ageText}
+            </p>
+            <p class="text-blue-700 font-extrabold text-2xl mb-4">
+              Price on request
+            </p>
+            <div class="mt-auto">
+              <button 
+                class="view-details-btn w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-blue-700"
+                data-doc-id="${docId}">
+                View Details
+              </button>
+            </div>
+          </div>
+        `;
+        return card;
+      };
+
+      // --- NEW: Function to load the marketplace ---
+      const loadMarketplace = async () => {
+        try {
+          const snapshot = await db.collection('sellQueries')
+            .where('status', '==', 'approved')
+            .orderBy('submittedAt', 'desc')
+            .get();
+
+          marketplaceGrid.innerHTML = ''; // Clear static cards
+
+          if (snapshot.empty) {
+            marketplaceGrid.innerHTML = '<p>No panels available right now. Check back soon!</p>';
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            panelDataMap.set(doc.id, data); // Save data for the click listener
+            const card = createMarketplaceCard(doc.id, data);
+            marketplaceGrid.appendChild(card);
+          });
+
+        } catch (error) {
+          console.error("Error loading marketplace:", error);
+          marketplaceGrid.innerHTML = '<p>Could not load marketplace. Please try again later.</p>';
+        }
+      };
+
+      // Load it!
+      loadMarketplace();
+
+    } // End if(marketplaceGrid)
+
+    // --- (REPLACED) "Interested?" Button (inside Product Detail Modal) ---
     const interestedBtn = document.getElementById('interested-btn');
     if (interestedBtn) {
-      interestedBtn.addEventListener('click', () => {
+      // MODIFIED: Added 'async'
+      interestedBtn.addEventListener('click', async () => {
         closeModal(document.getElementById('productDetailModal'));
         if (currentUser) {
-          // Gather product and user info
-          const productTitle = document.getElementById('modal-product-title')?.textContent || '';
-          const productId = document.getElementById('modal-product-id')?.textContent || '';
-          const userId = currentUser.uid;
-          const phoneNumber = currentUser.phoneNumber || '';
+          try {
+            // --- NEW: Fetch user's address (location) ---
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            let userLocation = 'N/A';
+            if (userDoc.exists) {
+              userLocation = userDoc.data().address || 'N/A';
+            }
+            // --- End fetch ---
 
-          // Submit to Firestore
-          db.collection('interestedQueries').add({
-            productId: productId,
-            productTitle: productTitle,
-            userId: userId,
-            userPhone: phoneNumber,
-            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }).then(() => {
+            // Gather product and user info
+            const productTitle = document.getElementById('modal-product-title')?.textContent || '';
+            // FIXED: Get the productId from the hidden span
+            const productId = document.getElementById('modal-product-id')?.textContent || '';
+            const userId = currentUser.uid;
+            const phoneNumber = currentUser.phoneNumber || 'N/A';
+
+            if (!productId) {
+              alert('Could not identify the product. Please try again.');
+              return;
+            }
+
+            // Submit to Firestore
+            await db.collection('interestedQueries').add({
+              productId: productId,
+              productTitle: productTitle,
+              userId: userId,
+              userPhone: phoneNumber,
+              userLocation: userLocation, // <-- ADDED FIELD
+              submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
             openModal('interestedQueryModal');
-          }).catch(error => {
+
+          } catch (error) {
             alert('Could not register your interest. Please try again.');
             console.error('Error writing interested query:', error);
-          });
+          }
         } else {
           alert("Please sign in to express your interest.");
           openModal('authModal');
@@ -160,44 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-    /*const interestedBtn = document.getElementById('interested-btn');
-    if (interestedBtn) {
-      interestedBtn.addEventListener('click', () => {
-        if (currentUser) {
-          // Logged in → show interest modal
-          closeModal(document.getElementById('productDetailModal'));
-          openModal('interestedQueryModal');
-        } else {
-          // Not logged in → show login modal
-          closeModal(document.getElementById('productDetailModal'));
-          alert("Please sign in to express your interest.");
-          openModal('authModal');
-          resetAuthForms();
-        }
-      });
-    }
-    // Gather product details from the modal (example ids, adapt for your markup)
-    const productTitle = document.getElementById('modal-product-title').textContent;
-    const productId = document.getElementById('modal-product-id') ? document.getElementById('modal-product-id').textContent : '';
-    const userId = currentUser.uid;
-    const phoneNumber = currentUser.phoneNumber || 'N/A';
 
-    // Save new interest query to Firestore
-    db.collection('interestedQueries').add({
-      productId: productId,
-      productTitle: productTitle,
-      userId: userId,
-      userPhone: phoneNumber,
-      submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      closeModal(document.getElementById('productDetailModal'));
-      openModal('interestedQueryModal');
-      // Optional: Display success message or toast
-    }).catch(error => {
-      alert('Could not register your query. Please try again later.');
-      console.error('Error writing interested query:', error);
-    });
-   */
     // --- All "Close" Buttons ---
     const closeBtns = document.querySelectorAll('.close-modal-btn');
     closeBtns.forEach(btn => {
@@ -228,68 +289,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const openMobileMenu = () => {
       if (mobileMenu) mobileMenu.classList.add('active');
       if (mobileMenuOverlay) mobileMenuOverlay.classList.add('active');
-      document.body.classList.add('modal-open'); // Prevent background scrolling
+      document.body.classList.add('modal-open');
     };
 
     const closeMobileMenu = () => {
       if (mobileMenu) mobileMenu.classList.remove('active');
       if (mobileMenuOverlay) mobileMenuOverlay.classList.remove('active');
-      document.body.classList.remove('modal-open'); // Allow background scrolling
+      document.body.classList.remove('modal-open');
     };
 
     if (mobileMenuBtn) {
       mobileMenuBtn.addEventListener('click', openMobileMenu);
     }
-
     if (mobileMenuCloseBtn) {
       mobileMenuCloseBtn.addEventListener('click', closeMobileMenu);
     }
-
     if (mobileMenuOverlay) {
       mobileMenuOverlay.addEventListener('click', closeMobileMenu);
     }
-
-    // ADDED: Close menu when a nav link is clicked
     const mobileNavLinks = document.querySelectorAll('#mobile-menu .nav-link-mobile');
     mobileNavLinks.forEach(link => {
       link.addEventListener('click', closeMobileMenu);
     });
-    // --- END OF MENU MODIFICATIONS ---
 
     // --- Buy/Sell Modal Buttons ---
     const buyBtn = document.getElementById('buy-btn');
     const sellBtn = document.getElementById('sell-btn');
 
     if (buyBtn && buyOrSellModal) {
-      // --- MODIFIED: Added auth check as requested ---
       buyBtn.addEventListener('click', () => {
         if (currentUser) {
           closeModal(buyOrSellModal);
           openModal('buyRequestModal');
         } else {
-          alert("Please log in or sign up to buy panels."); // Your custom alert
+          alert("Please log in or sign up to buy panels.");
           closeModal(buyOrSellModal);
           openModal('authModal');
           resetAuthForms();
         }
       });
-      // --- END MODIFIED BLOCK ---
     }
 
     if (sellBtn && buyOrSellModal) {
-      // --- MODIFIED: Added auth check as requested ---
       sellBtn.addEventListener('click', () => {
         if (currentUser) {
           closeModal(buyOrSellModal);
           openModal('sellPanelModal');
         } else {
-          alert("Please log in or sign up to sell panels."); // Your custom alert
+          alert("Please log in or sign up to sell panels.");
           closeModal(buyOrSellModal);
           openModal('authModal');
           resetAuthForms();
         }
       });
-      // --- END MODIFIED BLOCK ---
     }
 
     // --- Auth Modal Tabs (Sign In/Sign Up) ---
@@ -318,38 +370,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sellForm) {
       sellForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         if (!currentUser) {
           alert('Please sign in before submitting!');
           openModal(authModal);
           return;
         }
 
-        // Collect form fields
         const purchaseDate = sellForm.querySelector('input[type="date"]').value;
-        const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value; // Add name attribute
-        const panelParams = sellForm.querySelector('input[name="panel-params"]').value; // Add name attribute
+        const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value;
+        const panelParams = sellForm.querySelector('input[name="panel-params"]').value;
         const sellReceiptFile = document.getElementById('sell-receipt').files[0];
         const sellImageFile = document.getElementById('sell-image').files[0];
 
         let receiptImageURL = '';
         let panelImageURL = '';
-        const storageRef = firebase.storage().ref();
+        const storageRef = storage.ref(); // Use initialized storage
 
         try {
-          // Upload panel image (required)
           if (sellImageFile) {
             const imgSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-panel`).put(sellImageFile);
             panelImageURL = await imgSnap.ref.getDownloadURL();
           }
 
-          // Upload receipt if provided (optional)
           if (sellReceiptFile) {
             const receiptSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-receipt`).put(sellReceiptFile);
             receiptImageURL = await receiptSnap.ref.getDownloadURL();
           }
 
-          // Add to sellQueries collection with correct field names
           await db.collection('sellQueries').add({
             sellerID: currentUser.uid,
             sellerPhone: currentUser.phoneNumber || 'N/A',
@@ -358,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panelParams: panelParams,
             panelImageURL: panelImageURL,
             receiptImageURL: receiptImageURL,
-            status: 'pending', // pending, approved, rejected
+            status: 'pending',
             submittedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
@@ -377,27 +424,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (buyForm) {
       buyForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         if (!currentUser) {
           alert('Please sign in before submitting!');
           openModal(authModal);
           return;
         }
 
-        // Collect form input values
-        const requiredWattage = buyForm.querySelector('input[name="wattage"]').value; // Add name attribute
-        const budget = buyForm.querySelector('input[name="budget"]').value; // Add name attribute
-        const preference = buyForm.querySelector('input[name="preference"]').value; // Add name attribute
+        const requiredWattage = buyForm.querySelector('input[name="wattage"]').value;
+        const budget = buyForm.querySelector('input[name="budget"]').value;
+        const preference = buyForm.querySelector('input[name="preference"]').value;
 
         try {
-          // Add the buyer query to buyQueries collection
           await db.collection('buyQueries').add({
             buyerID: currentUser.uid,
             buyerPhone: currentUser.phoneNumber || 'N/A',
             requiredWattage: parseInt(requiredWattage),
             budget: parseFloat(budget),
             preference: preference,
-            status: 'searching', // searching, found, completed
+            status: 'searching',
             submittedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
@@ -447,34 +491,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Function to clear old reCAPTCHA
     function clearRecaptcha() {
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
-        window.recaptchaVerifier = null; // Set it to null after clearing
+        window.recaptchaVerifier = null;
       }
     }
 
-    // Function to reset auth forms to their original state
     function resetAuthForms() {
       clearRecaptcha();
-
-      // Reset Login Form
       if (loginForm) loginForm.reset();
       const loginPhoneSection = document.getElementById('login-phone-section');
       const loginOtpSection = document.getElementById('login-otp-section');
       const loginButton = document.getElementById('login-button');
-
       if (loginPhoneSection) loginPhoneSection.classList.remove('hidden');
       if (loginOtpSection) loginOtpSection.classList.add('hidden');
       if (loginButton) loginButton.textContent = 'Send OTP';
 
-      // Reset Signup Form
       if (signupForm) signupForm.reset();
       const signupDetailsSection = document.getElementById('signup-details-section');
       const signupOtpSection = document.getElementById('signup-otp-section');
       const signupButton = document.getElementById('signup-button');
-
       if (signupDetailsSection) signupDetailsSection.classList.remove('hidden');
       if (signupOtpSection) signupOtpSection.classList.add('hidden');
       if (signupButton) signupButton.textContent = 'Send OTP & Sign Up';
@@ -486,15 +523,10 @@ document.addEventListener('DOMContentLoaded', () => {
       loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const loginButton = document.getElementById('login-button');
-
         if (loginButton.textContent.includes('Send')) {
-          // Phase 1: Send OTP
           clearRecaptcha();
-          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-login', {
-            'size': 'invisible'
-          });
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-login', { 'size': 'invisible' });
           const phoneNumber = document.getElementById('login-phone').value;
-
           auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
             .then(confirmationResult => {
               window.confirmationResult = confirmationResult;
@@ -504,12 +536,8 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('OTP sent successfully!');
             }).catch(error => alert("Sign in failed: " + error.message));
         } else {
-          // Phase 2: Verify OTP
           const otp = document.getElementById('login-otp').value;
-          if (!otp) {
-            alert("Please enter the OTP.");
-            return;
-          }
+          if (!otp) { alert("Please enter the OTP."); return; }
           window.confirmationResult.confirm(otp).then(result => {
             alert("Successfully signed in!");
             closeModal(authModal);
@@ -526,14 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
       signupForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const signupButton = document.getElementById('signup-button');
-
         if (signupButton.textContent.includes('Send')) {
-          // Phase 1: Send OTP
           clearRecaptcha();
-          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-signup', {
-            size: 'invisible'
-          });
-
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container-signup', { size: 'invisible' });
           const phoneNumber = document.getElementById('signup-phone').value;
           auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
             .then((confirmationResult) => {
@@ -547,23 +570,16 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('Sign up failed: ' + error.message);
             });
         } else {
-          // Phase 2: Verify OTP and Create Profile
           const otp = document.getElementById('signup-otp').value;
-          if (!otp) {
-            alert('Please enter the OTP.');
-            return;
-          }
-
+          if (!otp) { alert('Please enter the OTP.'); return; }
           window.confirmationResult.confirm(otp)
             .then((result) => {
               const user = result.user;
               const name = document.getElementById('signup-name').value;
               const address = document.getElementById('signup-address').value;
-
-              // Save user info to 'users' collection with correct fields
               return db.collection('users').doc(user.uid).set({
                 name: name,
-                address: address,
+                address: address, // This is the 'userLocation'
                 phone: user.phoneNumber,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
               });

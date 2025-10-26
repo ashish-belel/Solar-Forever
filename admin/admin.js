@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
-  
+
   // Run the modal setup
   setupStaticModals();
 
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         adminLoginSection.classList.add('hidden');
         adminDashboardSection.classList.remove('hidden');
         console.log('Logged in as:', userCredential.user.email);
-        
+
         // Load admin data after login
         loadPendingSellerVerifications();
         loadPendingBuyerQueries();
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
       adminLoginSection.classList.add('hidden');
       adminDashboardSection.classList.remove('hidden');
       adminLoginError.classList.add('hidden');
-      
+
       // Load admin data
       loadPendingSellerVerifications();
       loadPendingBuyerQueries();
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-// --- Load Pending Seller Verifications (UPDATED with Event Delegation) ---
+  // --- Load Pending Seller Verifications (UPDATED with Event Delegation) ---
   async function loadPendingSellerVerifications() {
     const tbody = document.getElementById('seller-queries-tbody');
     if (!tbody) return;
@@ -126,10 +126,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        
+
         // Store the data in our map using the doc ID as the key
         sellerDataMap.set(doc.id, data);
-        
+
         const row = createSellerVerificationRow(doc.id, data);
         tbody.appendChild(row);
       });
@@ -138,14 +138,14 @@ document.addEventListener('DOMContentLoaded', function () {
       tbody.addEventListener('click', (event) => {
         // Check if the clicked element is our button
         const button = event.target.closest('.view-details-btn');
-        
+
         if (button) {
           // Get the ID we stored on the button
           const docId = button.dataset.docId;
-          
+
           // Get the data from our map
           const data = sellerDataMap.get(docId);
-          
+
           if (data) {
             // It works! Open the modal.
             showSellerVerificationModal(docId, data);
@@ -160,12 +160,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-// --- MODIFIED: Create Seller Verification ROW ---
+  // --- MODIFIED: Create Seller Verification ROW ---
   function createSellerVerificationRow(docId, data) {
     // MODIFIED: Create a <tr> element
     const row = document.createElement('tr');
     row.className = 'border-b hover:bg-gray-50';
-    
+
     // Format the date, or show N/A
     const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
 
@@ -188,16 +188,16 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-// --- Show Seller Verification Modal (UPDATED with alignment fix) ---
+  // --- Show Seller Verification Modal (UPDATED with alignment fix) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
-    
+
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'sellerVerificationModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-      
+
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
-      
+
       // Add close listeners ONCE when modal is created
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-      
+
       // Add backdrop click listener ONCE
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-    
+
     // --- Populate modal with data (from original file) ---
     document.getElementById('modal-panel-image').src = data.panelImageURL || '';
     document.getElementById('modal-panel-params').textContent = data.panelParams || 'N/A';
@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('modal-purchase-date').textContent = data.purchaseDate || 'N/A';
     document.getElementById('modal-purchased-from').textContent = data.purchasedFrom || 'N/A';
     document.getElementById('modal-status').textContent = data.status || 'N/A';
-    
+
     // Handle receipt image
     const receiptSection = document.getElementById('receipt-section');
     if (data.receiptImageURL) {
@@ -276,20 +276,20 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('modal-receipt-image').src = '';
       receiptSection.classList.add('hidden');
     }
-    
+
     // --- Attach approve/disapprove listeners ---
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-    
+
     document.getElementById('disapprove-btn').onclick = async () => {
       await disapproveSellerListing(docId);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-    
+
     // --- Show modal ---
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -305,9 +305,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Optional: Add to SoldSolar or marketplace collection
       // This depends on your business logic
-      
+
       showConfirmation('Seller listing approved successfully!');
       loadPendingSellerVerifications(); // Reload the list
+      loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
     } catch (error) {
       console.error('Error approving listing:', error);
       showConfirmation('Error approving listing.');
@@ -323,13 +324,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
       showConfirmation('Seller listing disapproved.');
       loadPendingSellerVerifications(); // Reload the list
+      loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
     } catch (error) {
       console.error('Error disapproving listing:', error);
       showConfirmation('Error disapproving listing.');
     }
   }
 
-// --- Load Pending Buyer Queries from buyQueries ---
+  // --- Load Pending Buyer Queries from buyQueries ---
   async function loadPendingBuyerQueries() {
     // MODIFIED: Target the new tbody ID
     const tbody = document.getElementById('buyer-queries-tbody');
@@ -354,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // MODIFIED: Create a <tr> element
         const row = document.createElement('tr');
         row.className = 'border-b hover:bg-gray-50';
-        
+
         const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
 
         // MODIFIED: Use <td> table cell markup
@@ -368,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </button>
           </td>
         `;
-        
+
         // MODIFIED: Add a click listener to open a dynamic modal
         row.querySelector('.view-details-btn').addEventListener('click', () => {
           showBuyerQueryModal(doc.id, data);
@@ -382,16 +384,64 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // --- NEW: Create Marketplace Card ---
+  function createMarketplaceCard(docId, data) {
+    const card = document.createElement('div');
+    card.className = "bg-white rounded-lg overflow-hidden shadow-md border flex flex-col";
+
+    // --- Tag Logic ---
+    let tagHtml = '';
+    if (data.status === 'approved') {
+      tagHtml = `<span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Expert Verified</span>`;
+    } else if (data.status === 'pending') {
+      card.style.opacity = '0.65'; // Make pending items faded
+      tagHtml = `<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Pending Verification</span>`;
+    }
+    // --- End Tag Logic ---
+
+    // --- Age Logic ---
+    let ageText = '';
+    if (data.purchaseDate) {
+      try {
+        const purchaseYear = new Date(data.purchaseDate).getFullYear();
+        const currentYear = new Date().getFullYear();
+        const age = currentYear - purchaseYear;
+        if (age === 0) ageText = "(< 1 year old)";
+        else if (age === 1) ageText = "(1 year old)";
+        else ageText = `(${age} years old)`;
+      } catch (e) { /* ignore date error */ }
+    }
+    // --- End Age Logic ---
+
+    card.innerHTML = `
+    <img
+      src="${data.panelImageURL || 'https://via.placeholder.com/400x300.png?text=No+Image'}"
+      class="w-full h-48 object-cover bg-gray-100" alt="Solar Panel">
+    <div class="p-4 flex-1 flex flex-col">
+      ${tagHtml}
+      <h3 class="font-bold mt-2 text-lg text-gray-800">${data.panelParams || 'N/A'}</h3>
+      <p class="text-gray-600 text-sm">Condition: ${ageText}</p>
+      <div class="mt-4 flex-1 flex items-end">
+        <button data-doc-id="${docId}"
+          class="view-marketplace-btn w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          View Details
+        </button>
+      </div>
+    </div>
+  `;
+    return card;
+  }
+
   // --- NEW: Show Buyer Query Modal ---
   function showBuyerQueryModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('buyerQueryModal');
-    
+
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'buyerQueryModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-      
+
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -414,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
-      
+
       // Add close listeners ONCE when modal is created
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -422,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-      
+
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           modal.classList.add('hidden');
@@ -430,33 +480,76 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-    
+
     // Populate modal with specific data for THIS row
     document.getElementById('modal-buyer-id').textContent = data.buyerID || 'N/A';
     document.getElementById('modal-buyer-phone').textContent = data.buyerPhone || 'N/A';
     document.getElementById('modal-buyer-wattage').textContent = data.requiredWattage || 'N/A';
     document.getElementById('modal-buyer-budget').textContent = data.budget || 'N/A';
     document.getElementById('modal-buyer-preference').textContent = data.preference || 'N/A';
-    
+
     // Show modal
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
 
-  // --- Load Marketplace Panels (if you have a marketplace collection) ---
+  // --- Load Marketplace Panels (UPDATED) ---
   async function loadMarketplacePanels() {
-    // Implement if you have a separate marketplace collection
-    // For now, this can show approved sellQueries
+    const container = document.getElementById('marketplace-grid');
+    if (!container) return;
+
+    // Map to store data for event delegation
+    const panelDataMap = new Map();
+
+    try {
+      const snapshot = await db.collection('sellQueries')
+        // Load items that are 'pending' OR 'approved'
+        .where('status', 'in', ['pending', 'approved'])
+        .orderBy('submittedAt', 'desc')
+        .get();
+
+      container.innerHTML = ''; // Clear all static/old cards
+
+      if (snapshot.empty) {
+        container.innerHTML = '<p class="text-gray-600 col-span-full">No panels in the marketplace yet.</p>';
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        panelDataMap.set(doc.id, data); // Store data for the listener
+        const card = createMarketplaceCard(doc.id, data);
+        container.appendChild(card);
+      });
+
+      // --- Event Listener for new buttons ---
+      // We use event delegation, just like for the tables
+      container.addEventListener('click', (e) => {
+        const button = e.target.closest('.view-marketplace-btn');
+        if (button) {
+          const docId = button.dataset.docId;
+          const data = panelDataMap.get(docId);
+          if (data) {
+            // We use the SAME seller modal. It has all the info.
+            showSellerVerificationModal(docId, data);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Error loading marketplace panels:", error);
+      container.innerHTML = '<p class="text-red-600 col-span-full">Error loading marketplace data.</p>';
+    }
   }
 
   // --- Show Confirmation Message ---
   function showConfirmation(message) {
     if (!confirmationMessage) return;
-    
+
     confirmationMessage.textContent = message;
     confirmationMessage.classList.remove('hidden', 'translate-x-full');
     confirmationMessage.classList.add('translate-x-0');
-    
+
     setTimeout(() => {
       confirmationMessage.classList.remove('translate-x-0');
       confirmationMessage.classList.add('translate-x-full');
