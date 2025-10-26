@@ -188,16 +188,16 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-  // --- Show Seller Verification Modal (UPDATED with conditional buttons) ---
+// --- Show Seller Verification Modal (UPDATED with De-list button) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
-
+    
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'sellerVerificationModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-
+      
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
-
+      
       // Add close listeners ONCE (applies to all buttons with this class)
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-
+      
       // Add backdrop click listener ONCE
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-
+    
     // --- Populate modal with data ---
     document.getElementById('modal-panel-image').src = data.panelImageURL || '';
     document.getElementById('modal-panel-params').textContent = data.panelParams || 'N/A';
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('modal-purchase-date').textContent = data.purchaseDate || 'N/A';
     document.getElementById('modal-purchased-from').textContent = data.purchasedFrom || 'N/A';
     document.getElementById('modal-status').textContent = data.status || 'N/A';
-
+    
     // Handle receipt image
     const receiptSection = document.getElementById('receipt-section');
     if (data.receiptImageURL) {
@@ -302,21 +302,19 @@ document.addEventListener('DOMContentLoaded', function () {
       approvedActions.classList.remove('hidden');
       pendingActions.classList.add('hidden');
     } else {
-      // For 'rejected' or 'sold' (if they are ever opened)
       pendingActions.classList.add('hidden');
       approvedActions.classList.add('hidden');
     }
 
     // --- Attach ALL button listeners ---
-    // We use .onclick to re-assign listeners every time
-
+    
     // Pending actions
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-
+    
     document.getElementById('disapprove-btn').onclick = async () => {
       await disapproveSellerListing(docId);
       modal.classList.add('hidden');
@@ -329,13 +327,14 @@ document.addEventListener('DOMContentLoaded', function () {
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-
+    
+    // THE "DE-LIST" LISTENER IS BACK
     document.getElementById('delist-btn').onclick = async () => {
       await deListPanel(docId);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-
+    
     // --- Show modal ---
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -409,29 +408,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // --- NEW: Mark a Panel as Sold ---
-  // This moves the data to SoldSolar and removes it from the marketplace
+// --- NEW (Simplified): Mark a Panel as Sold ---
+  // This just updates the status to 'sold' to remove it from the UI.
   async function markPanelAsSold(docId, panelData) {
     try {
-      // 1. Get Seller Info from 'users' collection
-      const sellerInfo = await fetchUserInfo(panelData.sellerID);
-
-      // 2. Create the new SoldSolar document
-      // We fill in what we can. buyerInfo and salePrice aren't known from this flow.
-      await db.collection('SoldSolar').add({
-        panelInfo: panelData,
-        sellerInfo: sellerInfo || { uid: panelData.sellerID, phone: panelData.sellerPhone },
-        buyerInfo: {}, // No buyer info available from this button
-        saleDate: firebase.firestore.FieldValue.serverTimestamp(),
-        salePrice: null // No price available from this button
-      });
-
-      // 3. Update the original sellQuery status to 'sold'
+      // 1. Update the original sellQuery status to 'sold'
       await db.collection('sellQueries').doc(docId).update({
         status: 'sold'
       });
-
-      showConfirmation('Panel marked as sold and moved to SoldSolar.');
+      
+      showConfirmation('Panel marked as sold and removed from marketplace.');
       loadMarketplacePanels(); // Reload the marketplace
 
     } catch (error) {
