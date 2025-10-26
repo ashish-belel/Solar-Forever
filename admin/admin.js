@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-// --- Show Seller Verification Modal (UPDATED) ---
+// --- Show Seller Verification Modal (UPDATED with alignment fix) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
             <h3 class="text-xl font-bold">Seller Verification Details</h3>
-            <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
+            <button class="close-modal-btn mt-0 text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
           </div>
 
           <div class="p-6 max-h-[60vh] overflow-y-auto space-y-4">
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="space-y-2 text-gray-700">
               <p><span class="font-bold">Panel Parameters:</span> <span id="modal-panel-params"></span></p>
               <p><span class="font-bold">Seller ID:</span> <span id="modal-seller-id"></span></p>
-              <p><span class="font-bold">Seller Phone:</span> <span id="modal-seller-phone"></span></p>
+              <p><span class="font-bold">Seller Phone:</span> <span id="modal-seller-phone"></span></D>
               <p><span class="font-bold">Purchase Date:</span> <span id="modal-purchase-date"></span></p>
               <p><span class="font-bold">Purchased From:</span> <span id="modal-purchased-from"></span></p>
               <p><span class="font-bold">Status:</span> <span id="modal-status"></span></p>
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
           </div>
           
           <div class="flex justify-end items-center p-4 bg-gray-50 border-t gap-3">
-            <button class="close-modal-btn bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
+            <button class="close-modal-btn mt-0 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">
               Close
             </button>
             <button id="disapprove-btn" class="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
@@ -242,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function () {
       document.body.appendChild(modal);
       
       // Add close listeners ONCE when modal is created
-      // This will work for both the &times; and the 'Close' button
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           modal.classList.add('hidden');
@@ -279,8 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // --- Attach approve/disapprove listeners ---
-    // We use .onclick here because it re-assigns the listener every time,
-    // ensuring the buttons are always linked to the correct (docId, data).
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
