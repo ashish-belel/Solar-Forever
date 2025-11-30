@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SolarForever Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+  <script src="./firebase.js"></script>
+  <script defer src="./admin.js"></script>
+  <style>
+    /* Custom styles for modal transitions */
+    .modal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-content {
+      transition: transform 0.3s ease;
+    }
+
+    .modal.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .modal.hidden .modal-content {
+      transform: scale(0.95);
+    }
+
+    /* SVG Circle Chart Animation */
+    .circle-chart-progress {
+      transition: stroke-dashoffset 0.5s ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+  <div id="admin-login-section" class="min-h-screen flex items-center justify-center bg-gray-50">
+    <form id="admin-login-form" class="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
+      <h2 class="text-2xl font-bold mb-6 text-center text-blue-900">Admin Login</h2>
+      <div class="mb-4">
+        <!-- Replaced the old username input with email -->
+        <label for="admin-email" class="block text-gray-700 font-semibold mb-2">Email</label>
+        <input id="admin-email" name="email" type="email" placeholder="Enter your email"
+          class="w-full px-3 py-2 border border-gray-300 rounded" required>
+      </div>
+      <div class="mb-4">
+        <label for="admin-password" class="block text-gray-700 font-semibold mb-2">Password</label>
+        <input id="admin-password" name="password" type="password" placeholder="Enter your password"
+          class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          required>
+      </div>
+      <div id="admin-login-error" class="text-red-600 text-sm mb-4 hidden">Incorrect username or password.</div>
+      <button type="submit"
+        class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition-colors">Login</button>
+    </form>
+  </div>
+
+
+  <div id="admin-dashboard-section" class="hidden">
+    <header class="bg-blue-900 text-white py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-40">
+      <div class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.181-3.183m-4.991-2.691L7.5 7.5l-2.689 2.691M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h1 class="text-2xl font-bold">SolarForever Admin</h1>
+      </div>
+      <!--<span class="text-sm">Quality Check & Marketplace Dashboard</span>-->
+      <button id="admin-logout-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded 
+               hover:bg-yellow-300 hover:bg-opacity-80 transition-colors" type="button">
+        Logout
+      </button>
+
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <section id="seller-queries">
+          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Pending Seller Verifications</h2>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="p-4 font-semibold">Seller</th>
+                  <th class="p-4 font-semibold">Panel Type</th>
+                  <th class="p-4 font-semibold">Date</th>
+                  <th class="p-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b">
+                  <td class="p-4">Arjun Sharma</td>
+                  <td class="p-4">380W Bifacial</td>
+                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
+                  <td class="p-4"><button data-modal-target="sellerQueryModal1"
+                      class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View
+                      Details</button></td>
+                </tr>
+                <tr class="border-b">
+                  <td class="p-4">Priya Patel</td>
+                  <td class="p-4">350W Monocrystalline</td>
+                  <td class="p-4 text-sm text-gray-500">2025-09-24</td>
+                  <td class="p-4"><button data-modal-target="sellerQueryModal1"
+                      class="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200">View
+                      Details</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="buyer-queries">
+          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Buyer Inquiries</h2>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="p-4 font-semibold">Buyer</th>
+                  <th class="p-4 font-semibold">Inquiry Type</th>
+                  <th class="p-4 font-semibold">Date</th>
+                  <th class="p-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b">
+                  <td class="p-4">Rohan Mehta</td>
+                  <td class="p-4">General Requirement</td>
+                  <td class="p-4 text-sm text-gray-500">2025-09-26</td>
+                  <td class="p-4"><button data-modal-target="buyerQueryModal1"
+                      class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button>
+                  </td>
+                </tr>
+                <tr class="border-b">
+                  <td class="p-4">Sunita Singh</td>
+                  <td class="p-4">Specific Panel Interest</td>
+                  <td class="p-4 text-sm text-gray-500">2025-09-25</td>
+                  <td class="p-4"><button data-modal-target="buyerQueryModal2"
+                      class="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">View</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        </div> <section id="sold-items" class="mb-10">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-700">Sold Items History</h2>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <table class="w-full text-left">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="p-4 font-semibold">Panel</th>
+                <th class="p-4 font-semibold">Sale Price</th>
+                <th class="p-4 font-semibold">Buyer</th>
+                <th class="p-4 font-semibold">Seller</th>
+                <th class="p-4 font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="5" class="p-4 text-center">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      
+     <main class="container mx-auto px-6 py-8">
+
+      
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <section id="seller-queries">
+          </section>
+
+        <section id="buyer-queries">
+          </section>
+      </div> 
+      <section id="interested-queries">
+          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Interested Queries</h2>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="p-4 font-semibold">Buyer</th>
+                  <th class="p-4 font-semibold">Panel of Interest</th>
+                  <th class="p-4 font-semibold">Date</th>
+                  <th class="p-4 font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4" class="p-4 text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      
+      
+      <section id="marketplace-management">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-700">Marketplace Management</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <p class="col-span-4 text-center">Loading marketplace items...</p>
+        </div>
+      </section>
+      </main>
+  </div>
+
+  <!-- Seller Verification Modal 1 -->
+  <div id="sellerQueryModal1"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+      <!-- Seller Info section omitted for brevity -->
+
+      <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg gap-3">
+        <button class="action-btn bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700"
+          data-action="disapprove" data-panel-id="seller1">Disapprove Listing</button>
+        <button class="action-btn bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"
+          data-action="approve" data-panel-id="seller1">Approve Listing</button>
+      </div>
+    </div>
+  </div>
+  <!-- Buyer Inquiry Modal 1 -->
+  <div id="buyerQueryModal1"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
+      <div class="flex justify-between items-center p-4 border-b">
+        <h3 class="text-xl font-bold">Buyer Inquiry: General Requirement</h3>
+        <button data-modal-close="buyerQueryModal1" class="text-gray-500 hover:text-gray-800">&times;</button>
+      </div>
+      <div class="p-6 space-y-3">
+        <div><strong>Name:</strong> Rohan Mehta</div>
+        <div><strong>Phone:</strong> +91 99887 76655</div>
+        <div><strong>Address:</strong> 45, Solar Heights, Pune, Maharashtra</div>
+        <hr>
+        <h4 class="font-semibold text-lg pt-2">Requirements</h4>
+        <div class="text-sm space-y-2">
+          <p><strong>Required Wattage:</strong> 5000 W</p>
+          <p><strong>Budget:</strong> $2000</p>
+          <p><strong>Preference:</strong> Interested in Monocrystalline panels, open to any Tier 1 brand.</p>
+        </div>
+      </div>
+      <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
+        <button data-modal-close="buyerQueryModal1"
+          class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buyer Inquiry Modal 2 -->
+  <div id="buyerQueryModal2"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+      <div class="flex justify-between items-center p-4 border-b">
+        <h3 class="text-xl font-bold">Buyer Inquiry: Specific Panel</h3>
+        <button data-modal-close="buyerQueryModal2" class="text-gray-500 hover:text-gray-800">&times;</button>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-3">
+          <h4 class="font-semibold text-lg border-b pb-2">Buyer Information</h4>
+          <div><strong>Name:</strong> Sunita Singh</div>
+          <div><strong>Phone:</strong> +91 91234 56789</div>
+          <div><strong>Address:</strong> 789, Sunshine Apartments, Nagpur, Maharashtra</div>
+        </div>
+        <div class="space-y-3">
+          <h4 class="font-semibold text-lg border-b pb-2">Seller of Interest</h4>
+          <div><strong>Name:</strong> Priya Patel</div>
+          <div><strong>Phone:</strong> +91 98765 11223</div>
+          <div><strong>Address:</strong> 101, Power Lane, Mumbai, Maharashtra</div>
+        </div>
+        <div class="md:col-span-2 pt-2">
+          <h4 class="font-semibold text-lg border-b pb-2">Panel of Interest</h4>
+          <p>350W Monocrystalline Panel (Excellent Condition)</p>
+        </div>
+      </div>
+      <div class="flex justify-end items-center p-4 bg-gray-50 border-t rounded-b-lg">
+        <button data-modal-close="buyerQueryModal2"
+          class="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600">Close</button>
+      </div>
+    </div>
+  </div>
+<div id="matchModal"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+      <div class="flex justify-between items-center p-4 border-b">
+        <h3 class="text-xl font-bold">Match Buyer to an Available Panel</h3>
+        <button data-modal-close="matchModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+      </div>
+      <div id="match-list-container" class="p-6 max-h-[70vh] overflow-y-auto">
+        <p class="text-center">Loading available panels...</p>
+      </div>
+    </div>
+  </div>
+<div id="soldDetailModal"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
+      </div>
+  </div>
+  <div id="editMarketplaceModal" class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-xl font-bold">Edit Marketplace Listing</h3>
+            <button data-modal-close="editMarketplaceModal" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+        
+        <form id="edit-marketplace-form" class="p-6 space-y-4" style="max-height: 70vh; overflow-y: auto;">
+            <input type="hidden" id="edit-market-doc-id">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-market-brand" class="block text-sm font-medium">Brand *</label>
+                <input type="text" id="edit-market-brand" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+              <div>
+                <label for="edit-market-model" class="block text-sm font-medium">Model</label>
+                <input type="text" id="edit-market-model" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-market-wattage" class="block text-sm font-medium">Wattage (per panel) *</label>
+                <input type="number" id="edit-market-wattage" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+              <div>
+                <label for="edit-market-quantity" class="block text-sm font-medium">Quantity *</label>
+                <input type="number" id="edit-market-quantity" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-market-condition" class="block text-sm font-medium">Condition *</label>
+                <select id="edit-market-condition" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                  <option value="new">New</option>
+                  <option value="used">Used</option>
+                  <option value="refurbished">Refurbished</option>
+                </select>
+              </div>
+              <div>
+                <label for="edit-market-purchase-date" class="block text-sm font-medium">Purchase Date *</label>
+                <input type="date" id="edit-market-purchase-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="edit-market-price" class="block text-sm font-medium">Total Asking Price (₹) *</label>
+                <input type="number" id="edit-market-price" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+              <div>
+                <label for="edit-market-location" class="block text-sm font-medium">Location *</label>
+                <input type="text" id="edit-market-location" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+              </div>
+            </div>
+
+            <div>
+              <label for="edit-market-description" class="block text-sm font-medium">Description</label>
+              <textarea id="edit-market-description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Add more details about the item..."></textarea>
+            </div>
+            
+            <p class="text-sm text-gray-500">Note: Uploading new images is not supported via this edit form. This requires re-submission.</p>
+            
+            <div class="flex flex-col sm:flex-row gap-3 pt-4">
+              <button type="button" id="sell-item-market-btn" class="flex-1 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700" data-action="sell-item">
+                    Sell Item
+                </button>
+                <button type="submit" id="save-marketplace-btn" class="flex-1 bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">
+                    Save Changes
+                </button>
+                <button type="button" id="unpublish-marketplace-btn" class="flex-1 bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
+                    Unpublish / Remove
+                </button>
+            </div>
+        </form>
+    </div>
+  </div>
+<div id="interestedQueryModal"
+    class="modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
+      </div>
+  </div>
+</body>
+
+</html>

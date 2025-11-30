@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SolarForever - Trusted Marketplace for Used Solar Panels</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ... other styles ... */
+    /* ... your existing styles ... */
+    #header.scrolled {
+      /* ... your existing .scrolled styles ... */
+    }
+
+    /* ADD THIS NEW RULE */
+    #header {
+      /* This makes the slide animation smooth (500ms) */
+      transition: transform 0.5s ease-in-out, 
+                  background-color 0.3s ease, 
+                  box-shadow 0.3s ease;
+    }
+  
+    /* Add this CSS rule to prevent background scroll when modal is open */
+    body.modal-open {
+      overflow: hidden;
+    }
+     /* Add styles for the sticky header */
+    #header.scrolled {
+      background-color: #1e3a8a; /* Example: bg-blue-900 */
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Example: shadow-lg */
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+  <div id="myQueriesModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">My Submissions</h2>
+        <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+      </div>
+      
+      <div class="flex border-b mb-6">
+        <button id="my-sell-tab" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">My Sell Requests</button>
+        <button id="my-buy-tab" class="tab-btn flex-1 py-2 font-semibold border-b-2">My Buy Requests</button>
+      </div>
+
+      <div id="my-sell-content" class="space-y-4">
+        <p class="text-center">Loading...</p>
+      </div>
+
+      <div id="my-buy-content" class="space-y-4 hidden">
+        <p class="text-center">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="editBuyQueryModal" class="modal-backdrop">
+    <div class="modal-content">
+      <h2 class="text-2xl font-bold mb-6 text-center">Edit My Buy Request</h2>
+      <form id="edit-buy-form" class="space-y-4">
+        <div><label class="block text-sm font-medium">Required Wattage *</label>
+          <input type="number" id="edit-buy-wattage" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div><label class="block text-sm font-medium">Budget (₹) *</label>
+          <input type="number" id="edit-buy-budget" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+        <div><label class="block text-sm font-medium">Preference?</label>
+          <input type="text" id="edit-buy-preference" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+        </div>
+        <button type="submit" id="save-buy-query-btn" data-doc-id="" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
+          Save Changes
+        </button>
+        <button type="button" id="delete-buy-query-btn" data-doc-id="" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700">
+          Delete Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <header id="header" class="fixed top-0 left-0 right-0 z-50 ">
+  <!-- <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"> -->
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="flex items-center space-x-2">
+        <svg class="w-8 h-8 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.667 0l3.181-3.183m-4.991-2.691L7.5 7.5l-2.689 2.691M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span class="text-2xl font-bold text-white header-text">SolarForever</span>
+      </a>
+      <div class="hidden lg:flex items-center space-x-8">
+        <a href="#home" class="nav-link text-white font-medium header-text">Home</a>
+        <a href="#how-it-works" class="nav-link text-white font-medium header-text">How It Works</a>
+        <a href="#expertise" class="nav-link text-white font-medium header-text">Our Expertise</a>
+        <a href="#marketplace" class="nav-link text-white font-medium header-text">Marketplace</a>
+        <a href="#mission" class="nav-link text-white font-medium header-text">Our Mission</a>
+        <button id="my-queries-btn" class="nav-link text-white font-medium header-text hidden">My Queries</button>
+      </div>
+      <div class="hidden lg:flex items-center space-x-4">
+        <button id="login-signup-btn-desktop" class="bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Login / Sign Up</button>
+      </div>
+      <button id="mobile-menu-button" class="lg:hidden text-white header-text"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></button>
+    </nav>
+ <div id="mobile-menu" class="hidden lg:hidden bg-blue-900 bg-opacity-95 divide-y divide-blue-800">
+      <a href="#home" class="nav-link-mobile block text-white text-center py-3">Home</a>
+      <a href="#how-it-works" class="nav-link-mobile block text-white text-center py-3">How It Works</a>
+      <a href="#expertise" class="nav-link-mobile block text-white text-center py-3">Our Expertise</a>
+      <a href="#marketplace" class="nav-link-mobile block text-white text-center py-3">Marketplace</a>
+      <a href="#mission" class="nav-link-mobile block text-white text-center py-3">Our Mission</a>
+      
+      <div class="py-4 px-6 space-y-3">
+        <!-- <button id="get-started-btn-mobile" class="get-started-btn w-full bg-yellow-500 text-white font-semibold px-6 py-2 rounded-full hover:bg-yellow-600 transition duration-300">Get Started</button> -->
+        <button id="my-queries-btn-mobile" class="w-full text-white font-medium py-2 px-4 rounded-full border border-white hover:bg-white hover:text-blue-900 transition hidden">My Queries</button>
+        <button id="login-signup-btn-mobile" class="w-full bg-blue-700 text-white font-semibold px-6 py-2 rounded-full hover:bg-blue-800 transition duration-300 border border-blue-500">Login / Sign Up</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="relative h-screen flex items-center justify-center text-white bg-cover bg-center" style="background-image: url('https://images.pexels.com/photos/159397/solar-panel-array-power-sun-electricity-159397.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');">
+      <div class="absolute top-0 left-0 w-full h-full hero-overlay"></div>
+      <div class="relative z-10 text-center container mx-auto px-6">
+        <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">Where Solar Finds New Homes</h1>
+        <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">A simple way to buy and sell expert-verified used solar systems with confidence.</p>
+        <button id="get-started-btn-hero" class="get-started-btn bg-yellow-500 text-white font-semibold px-8 py-3 rounded-full hover:bg-yellow-600 transition duration-300 text-lg">
+          Get Started
+        </button>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="section-title mb-4">Simple & Secure Process</h2>
+            <p class="section-subtitle mb-12 max-w-3xl mx-auto">Whether you're buying or selling, we've streamlined the journey for your peace of mind.</p>
+            <div class="grid md:grid-cols-2 gap-12 text-left">
+                <div>
+                    <h3 class="text-2xl font-bold text-blue-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>For Selling Used Solar System</h3>
+                    <ol class="relative border-l border-gray-200">
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-800"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg></span>
+                            <h4 class="font-semibold">1. List Your Solar System</h4>
+                            <p class="text-gray-600 text-sm">Submit details about your Solar System —purchase info, specs, and photos.</p>
+                        </li>
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-800"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+                            <h4 class="font-semibold">2. Expert Quality Check</h4>
+                            <p class="text-gray-600 text-sm">Our partners conduct a thorough inspection and certify your system's quality.</p>
+                        </li>
+                        <li class="ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-800"><path d="M14 9-2 22"/><path d="m10 14 6-6"/><path d="M18 8a2.89 2.89 0 0 0-4.12 0l-2.02 2.02a2.89 2.89 0 0 0 0 4.12l2.02 2.02a2.89 2.89 0 0 0 4.12 0l4.12-4.12a2.89 2.89 0 0 0 0-4.12l-2.02-2.02a2.89 2.89 0 0 0-4.12 0l-4.12 4.12a2.89 2.89 0 0 0 0 4.12l2.02 2.02a2.89 2.89 0 0 0 4.12 0"/></svg></span>
+                            <h4 class="font-semibold">3. Connect & Sell</h4>
+                            <p class="text-gray-600 text-sm">We find a verified buyer and handle the secure transaction and logistics.</p>
+                        </li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-6 flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>For Buying Used Solar System</h3>
+                    <ol class="relative border-l border-gray-200">
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-800"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg></span>
+                            <h4 class="font-semibold">1. Find Suitable Solar System</h4>
+                            <p class="text-gray-600 text-sm">Browse our marketplace or submit your specific requirements.</p>
+                        </li>
+                        <li class="mb-10 ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-800"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M12 22V9"/><path d="m7 9 5 3 5-3"/></svg></span>
+                            <h4 class="font-semibold">2. Get Certified Quality</h4>
+                            <p class="text-gray-600 text-sm">Purchase with confidence, knowing every panel is expert-verified.</p>
+                        </li>
+                         <li class="ml-6">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-green-100 rounded-full -left-3 ring-8 ring-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-800"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+                            <h4 class="font-semibold">3. Professional Installation</h4>
+                            <p class="text-gray-600 text-sm">Our expert partners ensure a seamless and professional installation.</p>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="expertise" class="py-20 bg-blue-50">
+      <div class="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="section-title mb-4">Quality and Trust, Guaranteed.</h2>
+          <p class="section-subtitle mb-6">Our main attraction is our partnership with industry experts to perform quality checks and installation.</p>
+          <p class="text-gray-600 mb-6">Every panel listed on SolarForever undergoes a rigorous multi-point inspection by certified technicians. This process guarantees performance, safety, and longevity, giving you the assurance you'd expect from a brand new product, at a fraction of the cost.</p>
+          <ul class="space-y-3 text-gray-700">
+            <li class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Comprehensive performance testing.</li>
+            <li class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Structural integrity and micro-fracture checks.</li>
+            <li class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Certified installation by vetted professionals.</li>
+            <li class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Guaranteed payment security until complete installation.</li>
+          </ul>
+        </div>
+        <div>
+          <img src="https://raw.githubusercontent.com/asb789/Public-images/main/Handymen%20installing%20solar%20panels%20on%20the%20rooftop_%20Solar%20panel%20system%20installation.%20Concept%20of%20alternative%20energy%20and%20power%20sustainable%20resources.%20%20Solar%20modules.%20%20Stock%20Photo%20_%20Adobe%20Stock.jpg" alt="Technicians installing solar panels on a roof" class="rounded-lg shadow-2xl w-full h-auto object-cover">
+        </div>
+      </div>
+    </section>
+
+     <section id="marketplace" class="py-20">
+  <div class="container mx-auto px-6">
+    <h2 class="section-title text-center mb-12">Browse Our Marketplace</h2>
+
+    <div id="marketplace-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      </div>
+
+  </div>
+</section> 
+
+    <section id="mission" class="py-20 bg-white">
+      <div class="container mx-auto px-6 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mx-auto mb-4">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <h2 class="section-title mb-4">Our Mission & Goals</h2>
+        <p class="section-subtitle mb-8 max-w-3xl mx-auto">To accelerate the world's transition to sustainable energy by creating a reliable and accessible circular economy for solar products.</p>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-6"><h3 class="text-xl font-bold text-blue-900 mb-2">Reduce Waste</h3><p class="text-gray-600">Give solar panels a second life, preventing landfill waste and maximizing resource utilization.</p></div>
+          <div class="p-6"><h3 class="text-xl font-bold text-blue-900 mb-2">Increase Access</h3><p class="text-gray-600">Make solar energy more affordable and accessible to a wider range of individuals and businesses.</p></div>
+          <div class="p-6"><h3 class="text-xl font-bold text-blue-900 mb-2">Build Trust</h3><p class="text-gray-600">Establish the gold standard for quality and reliability in the second-hand solar market.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-blue-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-6 text-center">
+      <p class="text-lg font-bold">SolarForever</p>
+      <p class="mt-2 mb-6 text-gray-300 max-w-md mx-auto">Join us in building a sustainable future, one panel at a time.</p>
+      <div class="flex justify-center space-x-6">
+        <a href="#" class="text-gray-300 hover:text-yellow-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="#" class="text-gray-300 hover:text-yellow-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.4 3.3 4.4s-1.4 1.4-3.3 1.4c-1.9 0-3.3-1.4-3.3-1.4s1.7-3 3.3-4.4c-1.3-.7-2.7-1-4-1-2.2 0-4.1 1.2-5.4 3.1-1.3-1.9-3.2-3.1-5.4-3.1-1.3 0-2.7.3-4 1 .9-1.2 2.2-3.4 2.2-3.4S5.9 5.4 4 4c1.9 0 3.3 1.4 3.3 1.4S8.9 4 11.1 4c2.2 0 4.1 1.2 5.4 3.1 1.3-1.9 3.2-3.1 5.4-3.1z"/></svg></a>
+        <a href="#" class="text-gray-300 hover:text-yellow-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      </div>
+      <div class="border-t border-blue-800 mt-8 pt-6 text-sm text-gray-400">
+        © <span id="year"></span> SolarForever. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <div id="buyOrSellModal" class="modal-backdrop">
+    <div class="modal-content text-center">
+      <h2 class="text-2xl font-bold mb-6">Welcome! What would you like to do?</h2>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        
+        <button id="buy-btn" class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+          <span class="text-xl">🛒</span> Buy Panels
+        </button>
+        
+        <button id="sell-btn" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+          <span class="text-xl">💲</span> Sell Panels
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="authModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="flex border-b mb-6">
+        <button id="login-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2 active">Sign In</button>
+        <button id="signup-tab-btn" class="tab-btn flex-1 py-2 font-semibold border-b-2">Sign Up</button>
+      </div>
+      <form id="login-form" class="space-y-4" novalidate>
+        <h3 class="text-xl font-bold text-center">Sign In to Your Account</h3>
+        <div id="login-phone-section">
+          <div>
+            <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number (10 digits)</label>
+            <div class="relative mt-1">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 pointer-events-none">+91</span>
+              <input type="tel" id="login-phone" placeholder="9876543210" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required pattern="\d{10}" title="Please enter a 10-digit phone number">
+            </div>
+          </div>
+        </div>
+        <div id="login-otp-section" class="hidden">
+          <div>
+            <label for="login-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+            <input type="text" id="login-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required pattern="\d{6}" title="Please enter the 6-digit OTP">
+          </div>
+        </div>
+        <div id="recaptcha-container-login"></div>
+        <button type="submit" id="login-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP</button>
+      </form>
+      <form id="signup-form" class="space-y-4 hidden" novalidate>
+        <h3 class="text-xl font-bold text-center">Create a New Account</h3>
+        <div id="signup-details-section">
+          <div>
+            <label for="signup-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input type="text" id="signup-name" placeholder="Enter your full name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+          </div>
+          <div>
+            <label for="signup-address" class="block text-sm font-medium text-gray-700 mt-4">Address</label>
+            <input type="text" id="signup-address" placeholder="Enter your address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+          </div>
+          <div>
+            <label for="signup-phone" class="block text-sm font-medium text-gray-700 mt-4">Phone Number (10 digits)</label>
+            <div class="relative mt-1">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 pointer-events-none">+91</span>
+              <input type="tel" id="signup-phone" placeholder="9876543210" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required pattern="\d{10}" title="Please enter a 10-digit phone number">
+            </div>
+          </div>
+        </div>
+        <div id="signup-otp-section" class="hidden">
+          <div>
+            <label for="signup-otp" class="block text-sm font-medium text-gray-700">Enter OTP</label>
+            <input type="text" id="signup-otp" placeholder="123456" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required pattern="\d{6}" title="Please enter the 6-digit OTP">
+          </div>
+        </div>
+        <div id="recaptcha-container-signup"></div>
+        <button type="submit" id="signup-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Send OTP & Sign Up</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="sellPanelModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="flex justify-between items-center pb-3 border-b mb-6">
+        <h2 class="text-2xl font-bold">Sell Your Solar Panel</h2>
+        <button class="close-modal-btn text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+      </div>
+      
+      <form id="sell-panel-form" class="space-y-4" novalidate style="max-height: 70vh; overflow-y: auto; padding-right: 1rem;">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="sell-brand" class="block text-sm font-medium">Brand/Manufacturer *</label>
+            <input type="text" id="sell-brand" placeholder="e.g., Luminous, Waaree" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="sell-model" class="block text-sm font-medium">Model</label>
+            <input type="text" id="sell-model" placeholder="e.g., L1234" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="sell-wattage" class="block text-sm font-medium">Wattage (per panel) *</label>
+            <input type="number" id="sell-wattage" placeholder="e.g., 350" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="sell-quantity" class="block text-sm font-medium">Quantity *</label>
+            <input type="number" id="sell-quantity" placeholder="e.g., 10" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="sell-purchase-date" class="block text-sm font-medium">Purchase Date *</label>
+            <input type="date" id="sell-purchase-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label for="sell-location" class="block text-sm font-medium">Location *</label>
+            <input type="text" id="sell-location" placeholder="e.g., City, State" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+        </div>
+
+        <div>
+          <label for="sell-price" class="block text-sm font-medium">Total Asking Price (₹) *</label>
+          <input type="number" id="sell-price" placeholder="e.g., 50000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
+
+        <div>
+          <label for="sell-purchased-from" class="block text-sm font-medium">Purchased From (Optional)</label>
+          <input type="text" id="sell-purchased-from" placeholder="e.g., SunPower, Local Installer" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Upload Panel Image *</label>
+          <input type="file" id="sell-panel-image" accept="image/jpeg, image/png, image/webp" class="mt-1 block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:text-sm file:font-semibold
+            file:bg-green-50 file:text-green-700
+            hover:file:bg-green-100" required>
+          <img id="sell-image-preview" src="#" alt="Image Preview" class="hidden w-32 h-32 object-cover mt-2 rounded-md border">
+          <p id="upload-progress" class="text-sm text-blue-600 mt-1 hidden">Uploading...</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Upload Receipt (Optional)</label>
+          <input type="file" id="sell-receipt-image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded-md file:border-0
+            file:text-sm file:font-semibold
+            file:bg-blue-50 file:text-blue-700
+            hover:file:bg-blue-100">
+          <img id="sell-receipt-preview" src="#" alt="Receipt Preview" class="hidden w-32 h-32 object-cover mt-2 rounded-md border">
+        </div>
+        
+        <button type="submit" id="sell-submit-button" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit for Review</button>
+      </form>
+
+      <div id="sell-success" class="hidden text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-green-500 mx-auto mb-4">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+        <h3 class="text-xl font-bold">Submission Received!</h3>
+        <p class="text-gray-600 mt-2">Thank you! Our team will review your submission and contact you within 2-3 business days to schedule a quality check.</p>
+        <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn" onclick="resetSellForm()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="buyRequestModal" class="modal-backdrop">
+    <div class="modal-content">
+      <h2 class="text-2xl font-bold mb-6 text-center">Find Your Perfect Panel</h2>
+      <form id="buy-form" class="space-y-4" novalidate>
+        <div><label class="block text-sm font-medium">What is your required total wattage? *</label><input type="number" placeholder="e.g., 5000 W" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required></div>
+        <div><label class="block text-sm font-medium">What is your budget (₹)? *</label><input type="number" placeholder="e.g., 2000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required></div>
+        <div><label class="block text-sm font-medium">Any specific brand or type preference?</label><input type="text" placeholder="e.g., Canadian Solar, Bifacial" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"></div>
+        <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Find a Match</button>
+      </form>
+      <div id="buy-result-found" class="hidden text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-green-500 mx-auto mb-4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h3 class="text-xl font-bold">We've Found Potential Matches!</h3>
+        <p class="text-gray-600 mt-2">Your query has been registered. An expert will contact you shortly to discuss these options.</p>
+        <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn">Close</button>
+      </div>
+      <div id="buy-result-not-found" class="hidden text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-blue-500 mx-auto mb-4"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+        <h3 class="text-xl font-bold">Query Registered!</h3>
+        <p class="text-gray-600 mt-2">We don't have an exact match right now, but we've saved your request. We'll contact you as soon as a good match is found!</p>
+        <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="productDetailModal" class="modal-backdrop">
+    <div class="modal-content relative" style="max-width: 400px; max-height: 500px;">
+      <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl close-modal-btn">&times;</button>
+      <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
+        <div id="product-details-section" class="p-2">
+          <div class="bg-white rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
+            <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
+          </div>
+          <img id="modal-product-img" src="" alt="Product Image" class="w-full h-64 object-cover rounded-md mb-4">
+          <h4 id="modal-product-title" class="text-xl font-semibold text-blue-900 mb-2"></h4>
+          <p id="modal-product-condition" class="text-gray-600 mb-2"></p>
+          <p class="text-base mb-4">A high-efficiency solar panel perfect for residential or commercial use. This unit has been professionally inspected and verified to meet our quality standards, ensuring reliable performance and excellent value.</p>
+          <h5 class="font-bold text-lg mb-2 text-blue-800">Specifications</h5>
+          <ul class="space-y-2 text-gray-700 mb-2">
+            <li><span class="font-bold">Price:</span> <span id="modal-product-price" class="text-lg text-blue-700"></span></li>
+            <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage">N/A</span></li>
+            <li><span class="font-bold">Age:</span> <span id="modal-product-age">N/A</span></li>
+            <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status" class="text-green-700">N/A</span></li>
+            <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location" class="text-gray-800">New Delhi, India</span></li>
+          </ul>
+          <div class="flex justify-center mt-6 mb-2">
+            <button id="interested-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="interestedQueryModal" class="modal-backdrop">
+    <div class="modal-content text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-green-500 mx-auto mb-4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <h3 class="text-xl font-bold">Query Registered!</h3>
+      <p class="text-gray-600 mt-2">Our experts will contact you soon to discuss purchase and installation details.</p>
+      <button class="mt-6 w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg close-modal-btn">Close</button>
+    </div>
+  </div>
+
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+ <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+ <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+ <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+ <script defer src="js/script.js"></script>
+
+</body>
+</html>
