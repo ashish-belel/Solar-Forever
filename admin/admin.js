@@ -103,61 +103,50 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Load Pending Seller Verifications (UPDATED with Event Delegation) ---
-  async function loadPendingSellerVerifications() {
+  // --- Load Pending Seller Verifications (Real-time) ---
+  function loadPendingSellerVerifications() {
     const tbody = document.getElementById('seller-queries-tbody');
     if (!tbody) return;
 
-    // We need a way to link the clicked button back to its data
     const sellerDataMap = new Map();
 
-    try {
-      const snapshot = await db.collection('sellQueries')
-        .where('status', '==', 'pending')
-        .orderBy('submittedAt', 'desc')
-        .get();
-
-      tbody.innerHTML = ''; // Clear old rows
-
-      if (snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending seller verifications.</td></tr>';
-        return;
-      }
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-
-        // Store the data in our map using the doc ID as the key
-        sellerDataMap.set(doc.id, data);
-
-        const row = createSellerVerificationRow(doc.id, data);
-        tbody.appendChild(row);
-      });
-
-      // --- NEW: Add ONE listener to the entire table body ---
+    // Attach the event listener ONLY ONCE to the table body for event delegation
+    if (!tbody.dataset.listenerAttached) {
       tbody.addEventListener('click', (event) => {
-        // Check if the clicked element is our button
         const button = event.target.closest('.view-details-btn');
-
         if (button) {
-          // Get the ID we stored on the button
           const docId = button.dataset.docId;
-
-          // Get the data from our map
           const data = sellerDataMap.get(docId);
-
           if (data) {
-            // It works! Open the modal.
             showSellerVerificationModal(docId, data);
           }
         }
       });
-      // --- End of new listener ---
-
-    } catch (error) {
-      console.error('Error loading seller verifications:', error);
-      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
+      tbody.dataset.listenerAttached = 'true';
     }
+
+    // Replace .get() with .onSnapshot()
+    db.collection('sellQueries')
+      .where('status', '==', 'pending')
+      .orderBy('submittedAt', 'desc')
+      .onSnapshot((snapshot) => {
+        tbody.innerHTML = ''; // Clear old rows
+
+        if (snapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending seller verifications.</td></tr>';
+          return;
+        }
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          sellerDataMap.set(doc.id, data);
+          const row = createSellerVerificationRow(doc.id, data);
+          tbody.appendChild(row);
+        });
+      }, (error) => {
+        console.error('Error loading seller verifications:', error);
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
+      });
   }
 
   // --- MODIFIED: Create Seller Verification ROW ---
@@ -188,16 +177,16 @@ document.addEventListener('DOMContentLoaded', function () {
     return row;
   }
 
-// --- Show Seller Verification Modal (UPDATED with hover effect) ---
+  // --- Show Seller Verification Modal (UPDATED with hover effect) ---
   function showSellerVerificationModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('sellerVerificationModal');
-    
+
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'sellerVerificationModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-      
+
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -258,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
-      
+
       // Add close listeners ONCE (applies to all buttons with this class)
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -266,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-      
+
       // Add backdrop click listener ONCE
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -275,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-    
+
     // --- Populate modal with data ---
     document.getElementById('modal-panel-image').src = data.panelImageURL || '';
     document.getElementById('modal-panel-params').textContent = data.panelParams || 'N/A';
@@ -284,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('modal-purchase-date').textContent = data.purchaseDate || 'N/A';
     document.getElementById('modal-purchased-from').textContent = data.purchasedFrom || 'N/A';
     document.getElementById('modal-status').textContent = data.status || 'N/A';
-    
+
     // Handle receipt image
     const receiptSection = document.getElementById('receipt-section');
     if (data.receiptImageURL) {
@@ -311,14 +300,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- Attach ALL button listeners ---
-    
+
     // Pending actions
     document.getElementById('approve-btn').onclick = async () => {
       await approveSellerListing(docId, data);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-    
+
     document.getElementById('disapprove-btn').onclick = async () => {
       await disapproveSellerListing(docId);
       modal.classList.add('hidden');
@@ -331,13 +320,13 @@ document.addEventListener('DOMContentLoaded', function () {
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-    
+
     document.getElementById('delist-btn').onclick = async () => {
       await deListPanel(docId);
       modal.classList.add('hidden');
       modal.classList.remove('flex');
     };
-    
+
     // --- Show modal ---
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -355,8 +344,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // This depends on your business logic
 
       showConfirmation('Seller listing approved successfully!');
-      loadPendingSellerVerifications(); // Reload the list
-      loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
+      //loadPendingSellerVerifications(); // Reload the list
+      //loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
     } catch (error) {
       console.error('Error approving listing:', error);
       showConfirmation('Error approving listing.');
@@ -371,8 +360,8 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       showConfirmation('Seller listing disapproved.');
-      loadPendingSellerVerifications(); // Reload the list
-      loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
+      //loadPendingSellerVerifications(); // Reload the list
+      //loadMarketplacePanels(); // <-- ADD THIS LINE to reload the marketplace
     } catch (error) {
       console.error('Error disapproving listing:', error);
       showConfirmation('Error disapproving listing.');
@@ -403,15 +392,15 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       showConfirmation('Panel has been de-listed.');
-      loadPendingSellerVerifications(); // Reload the list
-      loadMarketplacePanels(); // Reload the marketplace
+      //loadPendingSellerVerifications(); // Reload the list
+      //loadMarketplacePanels(); // Reload the marketplace
     } catch (error) {
       console.error('Error de-listing panel:', error);
       showConfirmation('Error de-listing panel.');
     }
   }
 
-// --- UPDATED: Mark a Panel as Sold ---
+  // --- UPDATED: Mark a Panel as Sold ---
   // This moves the data to SoldSolar and removes it from the marketplace
   async function markPanelAsSold(docId, panelData) {
     try {
@@ -427,14 +416,14 @@ document.addEventListener('DOMContentLoaded', function () {
         saleDate: firebase.firestore.FieldValue.serverTimestamp(),
         salePrice: null // No price available from this button
       });
-      
+
       // 3. Update the original sellQuery status to 'sold'
       await db.collection('sellQueries').doc(docId).update({
         status: 'sold'
       });
-      
+
       showConfirmation('Panel marked as sold and moved to SoldSolar.');
-      loadMarketplacePanels(); // Reload the marketplace
+      //loadMarketplacePanels(); // Reload the marketplace
 
     } catch (error) {
       console.error('Error marking as sold:', error);
@@ -442,57 +431,50 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // --- Load Pending Buyer Queries from buyQueries ---
-  async function loadPendingBuyerQueries() {
-    // MODIFIED: Target the new tbody ID
+  // --- Load Pending Buyer Queries (Real-time) ---
+  function loadPendingBuyerQueries() {
     const tbody = document.getElementById('buyer-queries-tbody');
     if (!tbody) return;
 
-    try {
-      const snapshot = await db.collection('buyQueries')
-        .where('status', '==', 'searching')
-        .orderBy('submittedAt', 'desc')
-        .get();
+    db.collection('buyQueries')
+      .where('status', '==', 'searching')
+      .orderBy('submittedAt', 'desc')
+      .onSnapshot((snapshot) => {
+        tbody.innerHTML = ''; // Clear old rows
 
-      tbody.innerHTML = ''; // Clear old rows
+        if (snapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending buyer queries.</td></tr>';
+          return;
+        }
 
-      if (snapshot.empty) {
-        // MODIFIED: Show message in a table row
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending buyer queries.</td></tr>';
-        return;
-      }
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const row = document.createElement('tr');
+          row.className = 'border-b hover:bg-gray-50';
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        // MODIFIED: Create a <tr> element
-        const row = document.createElement('tr');
-        row.className = 'border-b hover:bg-gray-50';
+          const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
 
-        const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
+          row.innerHTML = `
+            <td class="p-4">${data.buyerPhone || 'N/A'}</td>
+            <td class="p-4">${data.requiredWattage || 'N/A'}W / ₹${data.budget || 'N/A'}</td>
+            <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
+            <td class="p-4">
+              <button class="view-details-btn bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">
+                View
+              </button>
+            </td>
+          `;
 
-        // MODIFIED: Use <td> table cell markup
-        row.innerHTML = `
-          <td class="p-4">${data.buyerPhone || 'N/A'}</td>
-          <td class="p-4">${data.requiredWattage || 'N/A'}W / ₹${data.budget || 'N/A'}</td>
-          <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
-          <td class="p-4">
-            <button class="view-details-btn bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">
-              View
-            </button>
-          </td>
-        `;
+          row.querySelector('.view-details-btn').addEventListener('click', () => {
+            showBuyerQueryModal(doc.id, data);
+          });
 
-        // MODIFIED: Add a click listener to open a dynamic modal
-        row.querySelector('.view-details-btn').addEventListener('click', () => {
-          showBuyerQueryModal(doc.id, data);
+          tbody.appendChild(row);
         });
-
-        tbody.appendChild(row);
+      }, (error) => {
+        console.error('Error loading buyer queries:', error);
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
       });
-    } catch (error) {
-      console.error('Error loading buyer queries:', error);
-      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
-    }
   }
 
   // --- NEW: Create Marketplace Card ---
@@ -543,16 +525,16 @@ document.addEventListener('DOMContentLoaded', function () {
     return card;
   }
 
-// --- UPDATED: Show Buyer Query Modal (with hover effect) ---
+  // --- UPDATED: Show Buyer Query Modal (with hover effect) ---
   function showBuyerQueryModal(docId, data) {
     // Check if a modal already exists, if not, create it
     let modal = document.getElementById('buyerQueryModal');
-    
+
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'buyerQueryModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-      
+
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-lg transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -582,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
-      
+
       // Add close listeners ONCE when modal is created
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -590,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function () {
           modal.classList.remove('flex');
         });
       });
-      
+
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           modal.classList.add('hidden');
@@ -598,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
-    
+
     // Populate modal with specific data for THIS row
     document.getElementById('modal-buyer-id').textContent = data.buyerID || 'N/A';
     document.getElementById('modal-buyer-phone').textContent = data.buyerPhone || 'N/A';
@@ -613,77 +595,22 @@ document.addEventListener('DOMContentLoaded', function () {
       modal.classList.add('hidden'); // Hide this modal
       modal.classList.remove('flex');
     };
-    
+
     // Show modal
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
 
-  // --- Load Marketplace Panels (UPDATED to show 8 by default) ---
-  async function loadMarketplacePanels() {
+  // --- Load Marketplace Panels (Real-time) ---
+  function loadMarketplacePanels() {
     const container = document.getElementById('marketplace-grid');
     if (!container) return;
 
     const panelDataMap = new Map();
-    let itemCounter = 0; // <-- Counter
-    let toggleBtn = null; // <-- Button reference
+    let toggleBtn = null;
 
-    try {
-      const snapshot = await db.collection('sellQueries')
-        .where('status', 'in', ['pending', 'approved'])
-        .orderBy('submittedAt', 'desc')
-        .get();
-
-      container.innerHTML = ''; // Clear all static/old cards
-
-      if (snapshot.empty) {
-        container.innerHTML = '<p class="text-gray-600 col-span-full">No panels in the marketplace yet.</p>';
-        return;
-      }
-
-      snapshot.forEach((doc) => {
-        itemCounter++; // <-- Increment counter
-        const data = doc.data();
-        panelDataMap.set(doc.id, data);
-        const card = createMarketplaceCard(doc.id, data);
-
-        // --- NEW: Logic to hide extra items ---
-        if (itemCounter > 8) { // <-- CHANGED FROM 6
-          card.classList.add('hidden', 'admin-marketplace-extra');
-        }
-        // --- End new logic ---
-
-        container.appendChild(card);
-      });
-
-      // --- NEW: Add the "Show More" button if needed ---
-      if (itemCounter > 8) { // <-- CHANGED FROM 6
-        toggleBtn = document.createElement('button');
-        toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
-        toggleBtn.className = 'w-full bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-300 transition-colors mt-4 col-span-full';
-        toggleBtn.dataset.state = 'more';
-
-        container.appendChild(toggleBtn);
-
-        // Add click listener for the new button
-        toggleBtn.addEventListener('click', () => {
-          const extraItems = container.querySelectorAll('.admin-marketplace-extra');
-
-          if (toggleBtn.dataset.state === 'more') {
-            extraItems.forEach(item => item.classList.remove('hidden'));
-            toggleBtn.textContent = 'Show Less';
-            toggleBtn.dataset.state = 'less';
-          } else {
-            extraItems.forEach(item => item.classList.add('hidden'));
-            toggleBtn.textContent = `Show More (${itemCounter - 8})`; // <-- CHANGED FROM 6
-            toggleBtn.dataset.state = 'more';
-          }
-        });
-      }
-      // --- End new button logic ---
-
-
-      // --- Event Listener for new buttons (This is the same as before) ---
+    // Attach event listener ONLY ONCE for marketplace buttons
+    if (!container.dataset.listenerAttached) {
       container.addEventListener('click', (e) => {
         const button = e.target.closest('.view-marketplace-btn');
         if (button) {
@@ -694,11 +621,59 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       });
-
-    } catch (error) {
-      console.error("Error loading marketplace panels:", error);
-      container.innerHTML = '<p class="text-red-600 col-span-full">Error loading marketplace data.</p>';
+      container.dataset.listenerAttached = 'true';
     }
+
+    db.collection('sellQueries')
+      .where('status', 'in', ['pending', 'approved'])
+      .orderBy('submittedAt', 'desc')
+      .onSnapshot((snapshot) => {
+        container.innerHTML = ''; // Clear all static/old cards
+        let itemCounter = 0;
+
+        if (snapshot.empty) {
+          container.innerHTML = '<p class="text-gray-600 col-span-full">No panels in the marketplace yet.</p>';
+          return;
+        }
+
+        snapshot.forEach((doc) => {
+          itemCounter++;
+          const data = doc.data();
+          panelDataMap.set(doc.id, data);
+          const card = createMarketplaceCard(doc.id, data);
+
+          if (itemCounter > 8) {
+            card.classList.add('hidden', 'admin-marketplace-extra');
+          }
+
+          container.appendChild(card);
+        });
+
+        if (itemCounter > 8) {
+          toggleBtn = document.createElement('button');
+          toggleBtn.textContent = `Show More (${itemCounter - 8})`;
+          toggleBtn.className = 'w-full bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-300 transition-colors mt-4 col-span-full';
+          toggleBtn.dataset.state = 'more';
+
+          container.appendChild(toggleBtn);
+
+          toggleBtn.addEventListener('click', () => {
+            const extraItems = container.querySelectorAll('.admin-marketplace-extra');
+            if (toggleBtn.dataset.state === 'more') {
+              extraItems.forEach(item => item.classList.remove('hidden'));
+              toggleBtn.textContent = 'Show Less';
+              toggleBtn.dataset.state = 'less';
+            } else {
+              extraItems.forEach(item => item.classList.add('hidden'));
+              toggleBtn.textContent = `Show More (${itemCounter - 8})`;
+              toggleBtn.dataset.state = 'more';
+            }
+          });
+        }
+      }, (error) => {
+        console.error("Error loading marketplace panels:", error);
+        container.innerHTML = '<p class="text-red-600 col-span-full">Error loading marketplace data.</p>';
+      });
   }
 
   // --- Show Confirmation Message ---
@@ -718,7 +693,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 3000);
   }
 
-// --- NEW: Function to open the "Assign Seller" modal (UPDATED with hover effect) ---
+  // --- NEW: Function to open the "Assign Seller" modal (UPDATED with hover effect) ---
   function showAssignSellerModal(buyerDocId, buyerData) {
     // 1. Create the modal if it doesn't exist
     let modal = document.getElementById('assignSellerModal');
@@ -726,7 +701,7 @@ document.addEventListener('DOMContentLoaded', function () {
       modal = document.createElement('div');
       modal.id = 'assignSellerModal';
       modal.className = 'modal hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4';
-      
+
       modal.innerHTML = `
         <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-3xl transform">
           <div class="flex justify-between items-center p-4 border-b">
@@ -792,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Optional: Filter by wattage. Remove this line if you want to see all panels.
         // .where('panelParams', '>=', buyerData.requiredWattage + 'W') 
         .get();
-      
+
       container.innerHTML = ''; // Clear "Loading..."
 
       if (snapshot.empty) {
@@ -826,10 +801,10 @@ document.addEventListener('DOMContentLoaded', function () {
           if (!confirm("Are you sure you want to assign this panel? This will complete the sale.")) {
             return;
           }
-          
+
           const sellerDocId = button.dataset.sellerId;
           const sellerData = sellerPanelMap.get(sellerDocId);
-          
+
           if (sellerData) {
             await confirmAssignment(buyerDocId, buyerData, sellerDocId, sellerData);
           }
@@ -880,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // 5. Success!
       showConfirmation('Sale completed and saved to SoldSolar!');
       document.getElementById('assignSellerModal')?.classList.add('hidden'); // Close modal
-      
+
       // Reload all lists
       loadPendingBuyerQueries();
       loadMarketplacePanels();
