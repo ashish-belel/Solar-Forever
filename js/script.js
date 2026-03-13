@@ -242,55 +242,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } // End if(marketplaceGrid)
 
-    // --- (REPLACED) "Interested?" Button (inside Product Detail Modal) ---
+    // --- "Interested?" Button Logic ---
     const interestedBtn = document.getElementById('interested-btn');
     if (interestedBtn) {
-      // MODIFIED: Added 'async'
       interestedBtn.addEventListener('click', async () => {
+        // 1. Get the ID from the hidden span we added to index.html
+        const productId = document.getElementById('modal-product-id')?.textContent || '';
+        const productTitle = document.getElementById('modal-product-title')?.textContent || '';
+
+        if (!productId) {
+          alert('Could not identify the product. Please try again.');
+          return;
+        }
+
         closeModal(document.getElementById('productDetailModal'));
+
         if (currentUser) {
           try {
-            // --- NEW: Fetch user's address (location) ---
-            const userDocRef = db.collection('users').doc(currentUser.uid);
-            const userDoc = await userDocRef.get();
-            let userLocation = 'N/A';
-            if (userDoc.exists) {
-              userLocation = userDoc.data().address || 'N/A';
-            }
-            // --- End fetch ---
+            // Fetch user's address/location
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const userLocation = userDoc.exists ? (userDoc.data().address || 'N/A') : 'N/A';
 
-            // Gather product and user info
-            const productTitle = document.getElementById('modal-product-title')?.textContent || '';
-            // FIXED: Get the productId from the hidden span
-            const productId = document.getElementById('modal-product-id')?.textContent || '';
-            const userId = currentUser.uid;
-            const phoneNumber = currentUser.phoneNumber || 'N/A';
-
-            if (!productId) {
-              alert('Could not identify the product. Please try again.');
-              return;
-            }
-
-            // Submit to Firestore
+            // Submit inquiry
             await db.collection('interestedQueries').add({
               productId: productId,
               productTitle: productTitle,
-              userId: userId,
-              userPhone: phoneNumber,
-              userLocation: userLocation, // <-- ADDED FIELD
+              userId: currentUser.uid,
+              userPhone: currentUser.phoneNumber || 'N/A',
+              userLocation: userLocation,
+              status: 'pending',
               submittedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            openModal('interestedQueryModal');
-
+            alert('Request sent! The admin will contact you soon.');
           } catch (error) {
-            alert('Could not register your interest. Please try again.');
-            console.error('Error writing interested query:', error);
+            console.error('Error:', error);
+            alert('Failed to send request.');
           }
         } else {
-          alert("Please sign in to express your interest.");
+          alert("Please log in to express interest.");
           openModal('authModal');
-          resetAuthForms();
         }
       });
     }
