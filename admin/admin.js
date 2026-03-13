@@ -69,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Load admin data after login
         loadPendingSellerVerifications();
         loadPendingBuyerQueries();
+        loadInterestedQueries();
+        loadAssignedMatches();
         loadMarketplacePanels();
       })
       .catch((error) => {
@@ -94,6 +96,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // Load admin data
       loadPendingSellerVerifications();
       loadPendingBuyerQueries();
+      loadInterestedQueries();
+      loadAssignedMatches();
       loadMarketplacePanels();
     } else {
       adminDashboardSection.classList.add('hidden');
@@ -247,6 +251,12 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
       `;
       document.body.appendChild(modal);
+
+      document.getElementById('sold-btn').onclick = async () => {
+        await markPanelAsSold(docId, data);
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      };
 
       // Add close listeners ONCE (applies to all buttons with this class)
       modal.querySelectorAll('.close-modal-btn').forEach(btn => {
@@ -402,79 +412,235 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // --- UPDATED: Mark a Panel as Sold ---
   // This moves the data to SoldSolar and removes it from the marketplace
+  // --- Mark a Panel as Sold ---
   async function markPanelAsSold(docId, panelData) {
+    if (!confirm("Are you sure you want to mark this as SOLD? It will move to SoldSolar and leave the marketplace.")) return;
+
     try {
-      // 1. Get Seller Info from 'users' collection
+      // 1. Get Seller Info to include in the sale record
       const sellerInfo = await fetchUserInfo(panelData.sellerID);
 
-      // 2. Create the new SoldSolar document
-      // NOTE: Using SoldSolar as requested.
+      // 2. Create the record in 'SoldSolar' collection
       await db.collection('SoldSolar').add({
         panelInfo: panelData,
         sellerInfo: sellerInfo || { uid: panelData.sellerID, phone: panelData.sellerPhone },
-        buyerInfo: {}, // No buyer info available from this button
+        buyerInfo: {}, // Admin-manual sale usually has no specific buyer linked yet
         saleDate: firebase.firestore.FieldValue.serverTimestamp(),
-        salePrice: null // No price available from this button
+        status: 'completed'
       });
 
-      // 3. Update the original sellQuery status to 'sold'
+      // 3. Update the original listing to 'sold' so it disappears from the site
       await db.collection('sellQueries').doc(docId).update({
         status: 'sold'
       });
 
       showConfirmation('Panel marked as sold and moved to SoldSolar.');
-      //loadMarketplacePanels(); // Reload the marketplace
-
+      loadMarketplacePanels(); // Refresh the list
     } catch (error) {
       console.error('Error marking as sold:', error);
-      showConfirmation('Error marking panel as sold.');
+      alert('Error updating status.');
     }
   }
 
-  // --- Load Pending Buyer Queries (Real-time) ---
+  // --- Global State for Matching ---
+  let activeBuyerId = null;
+  let activeBuyerData = null;
+  let verifiedSellersMap = new Map();
+
+  // --- 1. Load Buyer Queries (Left Split) ---
   function loadPendingBuyerQueries() {
     const tbody = document.getElementById('buyer-queries-tbody');
     if (!tbody) return;
 
-    db.collection('buyQueries')
-      .where('status', '==', 'searching')
-      .orderBy('submittedAt', 'desc')
-      .onSnapshot((snapshot) => {
-        tbody.innerHTML = ''; // Clear old rows
+    db.collection('buyQueries').where('status', '==', 'searching').onSnapshot((snapshot) => {
+      tbody.innerHTML = '';
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No requests found.</td></tr>';
+        return;
+      }
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const row = document.createElement('tr');
+        row.className = 'border-b hover:bg-gray-50';
+        row.innerHTML = `
+        <td class="p-3 font-medium">${data.buyerPhone || 'N/A'}</td>
+        <td class="p-3">${data.requiredWattage || 'N/A'}W / ₹${data.budget || 'N/A'}</td>
+        <td class="p-3 text-center">
+          <button class="match-btn bg-purple-600 text-white px-3 py-1 rounded text-[10px] font-bold hover:bg-purple-700">MATCH</button>
+        </td>
+      `;
+        // Attach click event safely
+        row.querySelector('.match-btn').addEventListener('click', () => openMatchModal(doc.id, data));
+        tbody.appendChild(row);
+      });
+    });
+  }
 
+  // --- 2. Match Modal Logic ---
+  window.openMatchModal = async function (buyerId, buyerData) {
+    activeBuyerId = buyerId;
+    activeBuyerData = buyerData;
+    const modal = document.getElementById('matchModal');
+    const content = document.getElementById('match-modal-content');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    content.innerHTML = '<p class="text-center py-4 text-gray-600">Searching for verified panels...</p>';
+
+    try {
+      const snapshot = await db.collection('sellQueries').where('status', '==', 'approved').get();
+      content.innerHTML = '';
+      verifiedSellersMap.clear();
+
+      if (snapshot.empty) {
+        content.innerHTML = '<p class="text-center text-red-500 py-4">No verified sellers available right now.</p>';
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const sellerData = doc.data();
+        verifiedSellersMap.set(doc.id, sellerData);
+
+        const card = document.createElement('div');
+        card.className = "flex justify-between items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50";
+        card.innerHTML = `
+        <div>
+          <p class="font-bold text-gray-800">${sellerData.panelParams || 'Unknown Panel'}</p>
+          <p class="text-sm text-gray-600">Seller Phone: ${sellerData.sellerPhone || 'N/A'}</p>
+        </div>
+        <button class="assign-btn bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700">
+          Assign
+        </button>
+      `;
+        card.querySelector('.assign-btn').addEventListener('click', () => confirmMatchAssignment(doc.id));
+        content.appendChild(card);
+      });
+    } catch (error) {
+      console.error("Error loading sellers:", error);
+      content.innerHTML = '<p class="text-center text-red-500 py-4">Error loading sellers.</p>';
+    }
+  };
+
+  window.closeMatchModal = function () {
+    document.getElementById('matchModal').classList.add('hidden');
+    document.getElementById('matchModal').classList.remove('flex');
+  };
+
+  async function confirmMatchAssignment(sellerId) {
+    const sellerData = verifiedSellersMap.get(sellerId);
+    if (!confirm(`Are you sure you want to assign this panel to buyer ${activeBuyerData.buyerPhone}?`)) return;
+
+    try {
+      // 1. Create Assigned Match Record
+      await db.collection('assignedMatches').add({
+        buyerId: activeBuyerId,
+        buyerPhone: activeBuyerData.buyerPhone,
+        sellerId: sellerId,
+        sellerPhone: sellerData.sellerPhone,
+        panelDetails: sellerData.panelParams,
+        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // 2. Update Buyer query status so it leaves the table
+      await db.collection('buyQueries').doc(activeBuyerId).update({ status: 'assigned' });
+
+      // 3. Mark the seller's panel as sold so it leaves the marketplace
+      await db.collection('sellQueries').doc(sellerId).update({ status: 'sold' });
+
+      closeMatchModal();
+      showConfirmation("Match assigned successfully!");
+    } catch (error) {
+      console.error("Assignment error:", error);
+      alert("Failed to assign match.");
+    }
+  }
+
+  function loadAssignedMatches() {
+    const tbody = document.getElementById('assigned-matches-tbody');
+    if (!tbody) return;
+
+    // We listen to the collection. If 'assignedAt' is null (server delay), it still shows up.
+    db.collection('assignedMatches').onSnapshot((snapshot) => {
+      tbody.innerHTML = '';
+
+      if (snapshot.empty) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No matches found in database.</td></tr>';
+        return;
+      }
+
+      // Sort manually in JS to handle the temporary null timestamp from Firebase
+      const docs = [];
+      snapshot.forEach(doc => docs.push(doc.data()));
+      docs.sort((a, b) => (b.assignedAt?.seconds || 0) - (a.assignedAt?.seconds || 0));
+
+      docs.forEach(data => {
+        const dateStr = data.assignedAt ? data.assignedAt.toDate().toLocaleDateString() : 'Processing...';
+        const row = `
+        <tr class="border-b hover:bg-gray-50 transition-colors">
+          <td class="p-4 font-medium text-gray-900">${data.buyerPhone}</td>
+          <td class="p-4 text-gray-700">${data.sellerPhone}</td>
+          <td class="p-4 text-blue-700 font-semibold">${data.panelDetails}</td>
+          <td class="p-4 text-gray-500 text-sm">${dateStr}</td>
+        </tr>
+      `;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+    });
+  }
+
+  // MAKE SURE TO CALL loadAssignedMatches() when the page loads!
+  document.addEventListener('DOMContentLoaded', () => {
+    // ... your existing init calls
+    loadAssignedMatches();
+  });
+
+  // --- 2. Load Specific Product Interests (Real-time) ---
+  function loadInterestedQueries() {
+    const tbody = document.getElementById('interested-queries-tbody');
+    if (!tbody) return;
+
+    db.collection('interestedQueries')
+      .where('status', '==', 'pending')
+      .onSnapshot((snapshot) => {
+        tbody.innerHTML = '';
         if (snapshot.empty) {
-          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-gray-600 text-center">No pending buyer queries.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No product interests.</td></tr>';
           return;
         }
 
         snapshot.forEach((doc) => {
           const data = doc.data();
           const row = document.createElement('tr');
-          row.className = 'border-b hover:bg-gray-50';
-
-          const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
-
+          row.className = "border-b hover:bg-gray-50";
           row.innerHTML = `
-            <td class="p-4">${data.buyerPhone || 'N/A'}</td>
-            <td class="p-4">${data.requiredWattage || 'N/A'}W / ₹${data.budget || 'N/A'}</td>
-            <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
-            <td class="p-4">
-              <button class="view-details-btn bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-green-200">
-                View
+            <td class="p-3 font-medium">${data.userPhone}</td>
+            <td class="p-3 text-blue-700 font-semibold truncate max-w-[120px]">${data.productTitle}</td>
+            <td class="p-3">
+              <button class="bg-orange-500 text-white px-3 py-1 rounded text-[10px] font-bold hover:bg-orange-600 transition-colors resolve-btn">
+                DONE
               </button>
             </td>
           `;
 
-          row.querySelector('.view-details-btn').addEventListener('click', () => {
-            showBuyerQueryModal(doc.id, data);
-          });
-
+          row.querySelector('.resolve-btn').onclick = () => resolveInterest(doc.id);
           tbody.appendChild(row);
         });
-      }, (error) => {
-        console.error('Error loading buyer queries:', error);
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-red-600 text-center">Error loading data.</td></tr>';
       });
+  }
+
+  // --- Action: Resolve Product Interest ---
+  async function resolveInterest(id) {
+    if (!confirm("Have you contacted this buyer? Marking as done will remove it from this list.")) return;
+    try {
+      await db.collection('interestedQueries').doc(id).update({
+        status: 'contacted',
+        resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      showConfirmation("Buyer marked as contacted.");
+    } catch (error) {
+      console.error("Error updating interest:", error);
+      alert("Failed to update status.");
+    }
   }
 
   // --- NEW: Create Marketplace Card ---
@@ -863,6 +1029,46 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (error) {
       console.error("Error confirming assignment:", error);
       alert("Error confirming assignment. Please try again.");
+    }
+  }
+  async function confirmMatchAssignment(sellerId) {
+    const sellerData = verifiedSellersMap.get(sellerId);
+
+    if (!sellerData || !activeBuyerData) {
+      alert("Data missing. Please try again.");
+      return;
+    }
+
+    try {
+      // 1. Create the record in 'assignedMatches'
+      await db.collection('assignedMatches').add({
+        buyerId: activeBuyerId,
+        buyerPhone: activeBuyerData.buyerPhone || 'N/A',
+        sellerId: sellerId,
+        sellerPhone: sellerData.sellerPhone || 'N/A',
+        panelDetails: sellerData.panelParams || `${sellerData.brand} ${sellerData.model}` || 'Solar Panel',
+        assignedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // 2. Update Buyer to 'assigned' so they leave the pending list
+      await db.collection('buyQueries').doc(activeBuyerId).update({
+        status: 'assigned'
+      });
+
+      // 3. Update Seller to 'sold' (optional, but keeps marketplace clean)
+      await db.collection('sellQueries').doc(sellerId).update({
+        status: 'sold'
+      });
+
+      closeMatchModal();
+      showConfirmation("Match assigned successfully!");
+
+      // Manual trigger just in case the real-time listener lags
+      loadAssignedMatches();
+
+    } catch (error) {
+      console.error("Assignment error:", error);
+      alert("Failed to assign: " + error.message);
     }
   }
 });

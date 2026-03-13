@@ -146,42 +146,103 @@
         </div>
       </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <section id="seller-queries">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Pending Seller Verifications</h2>
-          <div class="bg-white rounded-lg shadow-md h-72 overflow-y-auto">
+      <div class="container mx-auto py-8 mb-12">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-700">
+          <!--<span class="w-2 h-6 bg-blue-500 rounded-full mr-3"></span>-->
+          Inventory Management
+        </h2>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+          <div class="p-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
+            <h3 class="font-bold text-blue-800">Pending Seller Verifications</h3>
+          </div>
+          <div class="overflow-x-auto">
             <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b sticky top-0">
+              <thead class="bg-gray-50 text-gray-600 text-sm uppercase">
                 <tr>
                   <th class="p-4 font-semibold">Seller Phone</th>
                   <th class="p-4 font-semibold">Panel Type</th>
-                  <th class="p-4 font-semibold">Date Submitted</th>
-                  <th class="p-4 font-semibold">Action</th>
+                  <th class="p-4 font-semibold">Date</th>
+                  <th class="p-4 font-semibold text-center">Action</th>
                 </tr>
               </thead>
               <tbody id="seller-queries-tbody">
-                </tbody>
+              </tbody>
             </table>
           </div>
-        </section>
+        </div>
 
-        <section id="buyer-queries">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-700">Buyer Inquiries</h2>
-          <div class="bg-white rounded-lg shadow-md h-72 overflow-y-auto">
-            <table class="w-full text-left">
-              <thead class="bg-gray-50 border-b sticky top-0">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+          <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-4 bg-purple-50 border-b border-purple-100">
+              <h3 class="font-bold text-purple-800">Find-a-Match Requests</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-[10px]">
+                  <tr>
+                    <th class="p-3">Buyer Phone</th>
+                    <th class="p-3">Req. Wattage / Budget</th>
+                    <th class="p-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="buyer-queries-tbody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-4 bg-orange-50 border-b border-orange-100">
+              <h3 class="font-bold text-orange-800">Specific Product Interests</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 uppercase text-[10px]">
+                  <tr>
+                    <th class="p-3">Buyer Phone</th>
+                    <th class="p-3">Product</th>
+                    <th class="p-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="interested-queries-tbody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+          <div class="p-4 bg-green-50 border-b border-green-100">
+            <h3 class="font-bold text-green-800">Assigned Match Records</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-gray-50 text-gray-500 uppercase text-[10px]">
                 <tr>
-                  <th class="p-4 font-semibold">Buyer Phone</th>
-                  <th class="p-4 font-semibold">Requirement (W / Budget)</th>
-                  <th class="p-4 font-semibold">Date Submitted</th>
-                  <th class="p-4 font-semibold">Action</th>
+                  <th class="p-4">Buyer Phone</th>
+                  <th class="p-4">Matched Seller Phone</th>
+                  <th class="p-4">Panel Details</th>
+                  <th class="p-4">Match Date</th>
                 </tr>
               </thead>
-              <tbody id="buyer-queries-tbody">
-                </tbody>
+              <tbody id="assigned-matches-tbody">
+              </tbody>
             </table>
           </div>
-        </section>
+        </div>
+      </div>
+      <div id="matchModal" class="hidden fixed inset-0 bg-black bg-opacity-60 items-center justify-center z-[100] p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl transform flex flex-col max-h-[80vh]">
+          <div class="flex justify-between items-center p-4 border-b bg-purple-600 text-white rounded-t-lg">
+            <h3 class="text-xl font-bold">Assign Verified Seller</h3>
+            <button onclick="closeMatchModal()" class="text-2xl font-bold hover:text-gray-200">&times;</button>
+          </div>
+          <div id="match-modal-content" class="p-4 overflow-y-auto flex-grow space-y-3">
+            <p class="text-center text-gray-500 py-4">Loading verified sellers...</p>
+          </div>
+        </div>
       </div>
 
       <section id="marketplace-management">
