@@ -479,6 +479,11 @@
           <input type="text" name="panel-params" placeholder="Brand, Model, Wattage"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
         </div>
+        <div>
+          <label class="block text-sm font-medium">Expected Selling Price (₹)</label>
+          <input type="number" id="sell-price" name="price" placeholder="e.g., 4500"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+        </div>
         <!--Added more descriptive type of Q&A -->
         <div class="mb-4">
           <label class="block text-gray-700 font-bold mb-2">Recommended Load</label>
@@ -602,7 +607,8 @@
             <li><span class="font-bold">Price:</span> <span id="modal-product-price"
                 class="text-lg text-blue-700"></span></li>
             <li><span class="font-bold">Wattage:</span> <span id="modal-product-wattage"></span></li>
-            <li><span class="font-bold">Recommended Load:</span> <span id="modal-product-load" class="text-blue-600 font-semibold"></span></li>
+            <li><span class="font-bold">Recommended Load:</span> <span id="modal-product-load"
+                class="text-blue-600 font-semibold"></span></li>
             <li><span class="font-bold">Age:</span> <span id="modal-product-age"></span></li>
             <li><span class="font-bold">Verification Status:</span> <span id="modal-product-status"
                 class="text-green-700"></span></li>

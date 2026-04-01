@@ -100,7 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
             openModal('productDetailModal');
             document.getElementById('modal-product-img').src = data.panelImageURL || '';
             document.getElementById('modal-product-title').textContent = data.panelParams || 'N/A';
-            document.getElementById('modal-product-price').textContent = 'Price on request'; // You can add price to sellQueries later
+            //document.getElementById('modal-product-price').textContent = 'Price on request'; //Price can be added later
+            document.getElementById('modal-product-price').textContent = data.price ? `₹${data.price}` : 'Price on request';
 
             // This hidden span now stores the all-important docId
             document.getElementById('modal-product-id').textContent = docId;
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 savingsContainer.innerHTML = savingsHTML;
               } else {
-                savingsContainer.innerHTML = ''; 
+                savingsContainer.innerHTML = '';
               }
             }
             // ==========================================
@@ -267,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
               Condition: Excellent ${ageText}
             </p>
             <p class="text-blue-700 font-extrabold text-2xl mb-4">
-              Price on request
+              ${data.price ? `₹${data.price}` : 'Price on request'}
             </p>
             <div class="mt-auto">
               <button 
@@ -514,6 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const purchaseDate = sellForm.querySelector('input[type="date"]').value;
         const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value;
         const panelParams = sellForm.querySelector('input[name="panel-params"]').value;
+        const expectedPrice = document.getElementById('sell-price').value;//newly added
         const loadType = document.getElementById('sell-load-type').value;
         const sellReceiptFile = document.getElementById('sell-receipt').files[0];
         const sellImageFile = document.getElementById('sell-image').files[0];
@@ -539,6 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
             purchaseDate: purchaseDate,
             purchasedFrom: purchasedFrom,
             panelParams: panelParams,
+            price: expectedPrice,
             loadType: loadType,
             panelImageURL: panelImageURL,
             receiptImageURL: receiptImageURL,
