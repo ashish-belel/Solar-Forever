@@ -124,6 +124,57 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById('modal-product-age').textContent = ageText.match(/\(([^)]+)\)/)[1];
             } catch (err) { /* ignore if parsing fails */ }
             document.getElementById('modal-product-status').textContent = "Expert Verified";
+            // ==========================================
+            // NEW: SAVINGS CALCULATOR LOGIC
+            // ==========================================
+            const savingsContainer = document.getElementById('modal-savings-container');
+            if (savingsContainer) {
+              // 1. Extract wattage number from a string like "350W Monocrystalline"
+              const wattageMatch = data.panelParams ? data.panelParams.match(/(\d+)/) : null;
+              const wattage = wattageMatch ? parseInt(wattageMatch[0]) : 0;
+              
+              // 2. Safely get the used price (fallback to 0 if price isn't added to DB yet)
+              const usedPrice = data.price ? parseFloat(data.price) : 0; 
+              
+              if (wattage > 0) {
+                // The Math Assumptions: 
+                // - New panels cost approx ₹30 per Watt in India
+                // - Avg 5 hours of peak sun/day
+                // - Electricity rate of approx ₹8/kWh
+                const newPanelCost = wattage * 30; 
+                const monthlyEnergySavings = (wattage / 1000) * 5 * 30 * 8; 
+                
+                let savingsHTML = `
+                  <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                      <h4 class="font-bold text-green-800 flex items-center mb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Estimated Savings
+                      </h4>
+                `;
+
+                // If price exists in DB, show upfront savings. Otherwise, just show the cost of a new panel.
+                if (usedPrice > 0) {
+                    const upfrontSavings = newPanelCost - usedPrice;
+                    savingsHTML += `<p class="text-sm text-green-700 mb-1">Save <strong>₹${upfrontSavings.toLocaleString()}</strong> upfront compared to buying new (Est. ₹${newPanelCost.toLocaleString()}).</p>`;
+                } else {
+                    savingsHTML += `<p class="text-sm text-green-700 mb-1">New panel cost estimate: <strong>₹${newPanelCost.toLocaleString()}</strong>.</p>`;
+                }
+
+                savingsHTML += `
+                      <p class="text-sm text-green-700">Estimated electricity savings: <strong>₹${monthlyEnergySavings.toFixed(0)}/month</strong></p>
+                      <p class="text-[10px] text-green-600 mt-2 opacity-80">*Based on 5hrs avg sun/day and ₹8/kWh electricity rate.</p>
+                  </div>
+                `;
+                savingsContainer.innerHTML = savingsHTML;
+              } else {
+                savingsContainer.innerHTML = ''; // Clear box if no valid wattage is found
+              }
+            }
+            // ==========================================
+            // END OF SAVINGS CALCULATOR LOGIC
+            // ========================================== 
           }
         }
       });
