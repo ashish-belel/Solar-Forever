@@ -164,13 +164,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const submittedDate = (data.submittedAt && typeof data.submittedAt.toDate === 'function')
       ? data.submittedAt.toDate().toLocaleDateString()
       : 'Just now...';
-      
+
     // MODIFIED: Use <td> table cell markup
     row.innerHTML = `
       <td class="p-4">${data.sellerPhone || 'N/A'}</td>
       <td class="p-4">${data.panelParams || 'N/A'}</td>
       <td class="p-4 text-sm text-gray-500">${submittedDate}</td>
-      <td class="p-4">
+      <td class="p-4 flex justify-center">
         <button 
           class="view-details-btn bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full hover:bg-blue-200"
           data-doc-id="${docId}">
