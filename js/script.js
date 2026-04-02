@@ -466,15 +466,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Updated Sell Button Listener
+    // Updated Sell Button Listener (use openModal helper)
     if (sellBtn) {
       sellBtn.addEventListener('click', () => {
-        resetSellModal(); // Clean the form first
-        const modal = document.getElementById('sellPanelModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex'); // Add flex for centering
-        }
+        resetSellModal();
+        closeModal(buyOrSellModal); // close selector if open
+        openModal('sellPanelModal');
       });
     }
 
