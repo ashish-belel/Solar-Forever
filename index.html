@@ -463,55 +463,79 @@
   </div>
   </div>
   <!-- Sell Panel Modal -->
-  <div id="sellPanelModal" class="modal-backdrop">
-    <div class="modal-content">
-      <h2 class="text-2xl font-bold mb-6 text-center">Sell Your Solar Panel</h2>
-      <form id="sell-form" class="space-y-4">
-        <div><label class="block text-sm font-medium">When did you purchase it?</label>
-          <input type="date" name="purchase-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-            required>
-        </div>
-        <div><label class="block text-sm font-medium">Who did you purchase it from?</label>
-          <input type="text" name="purchased-from" placeholder="e.g., SunPower, Local Installer"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
-        </div>
-        <div><label class="block text-sm font-medium">Panel Parameters (e.g., Monocrystalline, 350W)</label>
+  <div id="sellPanelModal"
+    class="modal-backdrop fixed inset-0 z-[100] hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="modal-content relative bg-white w-full rounded-lg"
+      style="max-width: 500px; max-height: 90vh; overflow: hidden;">
+      <div style="overflow-y: auto; max-height: 85vh; padding: 1.5rem;">
+        <h2 class="text-2xl font-bold mb-6 text-center">Sell Your Solar Panel</h2>
+        <form id="sell-form" class="space-y-4">
+          <div><label class="block text-sm font-medium">When did you purchase it?</label>
+            <input type="date" name="purchase-date"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div><label class="block text-sm font-medium">Who did you purchase it from?</label>
+            <input type="text" name="purchased-from" placeholder="e.g., SunPower, Local Installer"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <!--<div><label class="block text-sm font-medium">Panel Parameters (e.g., Monocrystalline, 350W)</label>
           <input type="text" name="panel-params" placeholder="Brand, Model, Wattage"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium">Expected Selling Price (₹)</label>
-          <input type="number" id="sell-price" name="price" placeholder="e.g., 4500"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
-        </div>
-        <!--Added more descriptive type of Q&A -->
-        <div class="mb-4">
-          <label class="block text-gray-700 font-bold mb-2">Recommended Load</label>
-          <select id="sell-load-type"
-            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-            <option value="" disabled selected>Select capability...</option>
-            <option value="Basic (Lights, Fans, Mobile Charging)">Basic (Lights, Fans, Mobile Charging)</option>
-            <option value="Standard (Fridge, TV, Computers)">Standard (Fridge, TV, Computers)</option>
-            <option value="Heavy Duty (AC, Geyser, Water Pump)">Heavy Duty (AC, Geyser, Water Pump)</option>
-          </select>
-        </div>
-        <div><label class="block text-sm font-medium">Upload receipt (optional)</label>
-          <input type="file" id="sell-receipt" accept="image/*"
-            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-        </div>
-        <div><label class="block text-sm font-medium">Upload image of solar panel</label>
-          <input type="file" id="sell-image" accept="image/*"
-            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            required>
-        </div><button type="submit"
-          class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit for
-          Review</button>
-        <!--Preview of how buyers will see the listing-->
-        <div id="seller-live-preview" class="hidden mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-          <h4 class="font-bold text-blue-800 text-sm">Listing Preview:</h4>
-          <p id="preview-text" class="text-xs text-blue-700 italic"></p>
-        </div>
-      </form>
+        </div>-->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Panel Type</label>
+              <select id="sell-panel-type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="Monocrystalline">Monocrystalline</option>
+                <option value="Polycrystalline">Polycrystalline</option>
+                <option value="Bifacial">Bifacial</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Wattage (W)</label>
+              <input type="number" id="sell-wattage" placeholder="e.g. 400"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mt-2">Brand/Model (Optional)</label>
+            <input type="text" id="sell-brand" placeholder="e.g. Tata, Loom Solar"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Expected Selling Price (₹)</label>
+            <input type="number" id="sell-price" name="price" placeholder="e.g., 4500"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+          </div>
+          <!--Added more descriptive type of Q&A -->
+          <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">Recommended Load</label>
+            <select id="sell-load-type"
+              class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="" disabled selected>Select capability...</option>
+              <option value="Basic (Lights, Fans, Mobile Charging)">Basic (Lights, Fans, Mobile Charging)</option>
+              <option value="Standard (Fridge, TV, Computers)">Standard (Fridge, TV, Computers)</option>
+              <option value="Heavy Duty (AC, Geyser, Water Pump)">Heavy Duty (AC, Geyser, Water Pump)</option>
+            </select>
+          </div>
+          <div><label class="block text-sm font-medium">Upload receipt (optional)</label>
+            <input type="file" id="sell-receipt" accept="image/*"
+              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+          <div><label class="block text-sm font-medium">Upload image of solar panel</label>
+            <input type="file" id="sell-image" accept="image/*"
+              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              required>
+          </div><button type="submit"
+            class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Submit for
+            Review</button>
+          <!--Preview of how buyers will see the listing-->
+          <div id="seller-live-preview" class="hidden mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+            <h4 class="font-bold text-blue-800 text-sm">Listing Preview:</h4>
+            <p id="preview-text" class="text-xs text-blue-700 italic"></p>
+          </div>
+        </form>
+      </div>
       <div id="sell-success" class="hidden text-center"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round" class="w-16 h-16 text-green-500 mx-auto mb-4">
@@ -584,13 +608,15 @@
     </div>
   </div>
 
-  <div id="productDetailModal" class="modal-backdrop">
-    <div class="modal-content relative" style="max-width: 400px; max-height: 500px; overflow: hidden;">
+  <div id="productDetailModal"
+    class="modal-backdrop fixed inset-0 z-[100] hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="modal-content relative" style="max-width: 400px; max-height: 90vh; overflow: hidden;">
       <button
         class="absolute top-2 right-4 close-modal-btn font-bold text-2xl text-white hover:text-black transition-colors">
         &times;
       </button>
-      <div id="product-detail-content" style="overflow-y: auto; max-height: 440px;">
+
+      <div id="product-detail-content" style="overflow-y: auto; max-height: 85vh;">
         <div id="product-details-section" class="p-2">
           <div class="bg-transparent rounded-lg shadow-lg p-3 mb-4 relative z-10" style="margin-top:-18px;">
             <h3 class="text-2xl font-bold text-gray-800 text-center">Product Details</h3>
@@ -615,12 +641,11 @@
             <li><span class="font-bold">Seller Location:</span> <span id="modal-product-location"
                 class="text-gray-800">New Delhi, India</span></li>
           </ul>
-          <div id="modal-savings-container" class="mt-4"></div> <!-- Dynamically added savings info -->
+          <div id="modal-savings-container" class="mt-4"></div>
           <div class="flex justify-center mt-6 mb-2">
             <button id="interested-btn"
               class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors">Interested?</button>
           </div>
-          <!-- Query message now handled by modal -->
         </div>
       </div>
     </div>

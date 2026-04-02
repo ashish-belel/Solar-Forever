@@ -515,6 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const purchaseDate = sellForm.querySelector('input[type="date"]').value;
         const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value;
         const panelParams = sellForm.querySelector('input[name="panel-params"]').value;
+        const panelType = document.getElementById('sell-panel-type').value;
+        const wattage = document.getElementById('sell-wattage').value;
+        const brand = document.getElementById('sell-brand').value;
         const expectedPrice = document.getElementById('sell-price').value;//newly added
         const loadType = document.getElementById('sell-load-type').value;
         const sellReceiptFile = document.getElementById('sell-receipt').files[0];
@@ -540,10 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sellerPhone: currentUser.phoneNumber || 'N/A',
             purchaseDate: purchaseDate,
             purchasedFrom: purchasedFrom,
-            panelParams: panelParams,
-            price: expectedPrice,
-            loadType: loadType,
-            panelImageURL: panelImageURL,
+            panelParams: `${wattage}W ${panelType} (${brand})`, // We combine them for the title
+            actualWattage: parseInt(wattage), // We save the pure number for math
+            price: document.getElementById('sell-price').value,
+            loadType: document.getElementById('sell-load-type').value, panelImageURL: panelImageURL,
             receiptImageURL: receiptImageURL,
             status: 'pending',
             submittedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -745,22 +748,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewBox = document.getElementById('seller-live-preview');
   const previewText = document.getElementById('preview-text');
 
-  function updateSellerPreview() {
-    const watts = parseInt(sellWattageInput.value.match(/\d+/));
-    const price = parseFloat(sellPriceInput.value);
+  const updateSellerPreview = () => {
+    const watts = parseInt(document.getElementById('sell-wattage').value) || 0;
+    const price = parseFloat(document.getElementById('sell-price').value) || 0;
 
-    if (watts > 0 && price > 0) {
+    if (watts > 10 && price > 100) {
       const estNewPrice = watts * 30;
       const savings = estNewPrice - price;
       previewBox.classList.remove('hidden');
-
-      if (savings > 0) {
-        previewText.innerHTML = `Buyers will see that they save <b>₹${savings.toLocaleString()}</b> by choosing your panel over a new one!`;
-      } else {
-        previewText.innerHTML = `⚠️ Your price is close to the cost of a new panel (₹${estNewPrice}). Consider lowering it to sell faster!`;
-      }
+      previewText.innerHTML = `Buyers will see <b>₹${savings.toLocaleString()}</b> in upfront savings!`;
+    } else {
+      previewBox.classList.add('hidden');
     }
-  }
+  };
 
   sellWattageInput.addEventListener('input', updateSellerPreview);
   sellPriceInput.addEventListener('input', updateSellerPreview);
