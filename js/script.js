@@ -780,25 +780,39 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error("Firebase initialization failed:", error);
     alert("Could not connect to services. Please try again later.");
   }
-  const sellWattageInput = document.getElementById('sell-panel-params');
+
+  // --- LIVE VALUE SCORE PREVIEW (robust, ID fixes) ---
+  const sellWattageInput = document.getElementById('sell-wattage'); // matches HTML
   const sellPriceInput = document.getElementById('sell-price');
   const previewBox = document.getElementById('seller-live-preview');
   const previewText = document.getElementById('preview-text');
 
-  const updateSellerPreview = () => {
-    const watts = parseInt(document.getElementById('sell-wattage').value) || 0;
-    const price = parseFloat(document.getElementById('sell-price').value) || 0;
+  function updateSellerPreview() {
+    // Guard against missing DOM nodes
+    if (!sellWattageInput || !sellPriceInput || !previewBox || !previewText) return;
 
-    if (watts > 10 && price > 100) {
+    const watts = parseInt(sellWattageInput.value, 10) || 0;
+    const price = parseFloat(sellPriceInput.value) || 0;
+
+    if (watts > 0 && price > 0) {
       const estNewPrice = watts * 30;
-      const savings = estNewPrice - price;
+      const savings = Math.round(estNewPrice - price);
       previewBox.classList.remove('hidden');
-      previewText.innerHTML = `Buyers will see <b>₹${savings.toLocaleString()}</b> in upfront savings!`;
+
+      if (savings > 0) {
+        previewText.innerHTML = `Buyers will see that they save <b>₹${savings.toLocaleString()}</b> by choosing your panel over a new one!`;
+      } else {
+        previewText.innerHTML = `⚠️ Your price is close to the cost of a new panel (₹${estNewPrice.toLocaleString()}). Consider lowering it to sell faster!`;
+      }
     } else {
       previewBox.classList.add('hidden');
+      previewText.textContent = '';
     }
-  };
+  }
 
-  sellWattageInput.addEventListener('input', updateSellerPreview);
-  sellPriceInput.addEventListener('input', updateSellerPreview);
+  if (sellWattageInput) sellWattageInput.addEventListener('input', updateSellerPreview);
+  if (sellPriceInput) sellPriceInput.addEventListener('input', updateSellerPreview);
+
+  // initialize preview if values are prefilled
+  updateSellerPreview();
 });
