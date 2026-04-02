@@ -160,8 +160,11 @@ document.addEventListener('DOMContentLoaded', function () {
     row.className = 'border-b hover:bg-gray-50';
 
     // Format the date, or show N/A
-    const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
-
+    //const submittedDate = data.submittedAt ? data.submittedAt.toDate().toLocaleDateString() : 'N/A';
+    const submittedDate = (data.submittedAt && typeof data.submittedAt.toDate === 'function')
+      ? data.submittedAt.toDate().toLocaleDateString()
+      : 'Just now...';
+      
     // MODIFIED: Use <td> table cell markup
     row.innerHTML = `
       <td class="p-4">${data.sellerPhone || 'N/A'}</td>
