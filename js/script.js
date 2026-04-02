@@ -666,6 +666,100 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("User is signed out.");
         if (loginBtnDesktop) loginBtnDesktop.textContent = 'Sign In / Sign Up';
       }
+      // --- MY ACTIVITY & NOTIFICATIONS LOGIC ---
+      const activityBellBtn = document.getElementById('activity-bell-btn');
+      const notificationBadge = document.getElementById('notification-badge');
+      const activityModal = document.getElementById('activityModal');
+      const activityListContainer = document.getElementById('activity-list-container');
+
+      if (user) {
+        // Show the floating bell since they are logged in
+        if (activityBellBtn) activityBellBtn.classList.remove('hidden');
+
+        // Listen to this specific user's listings
+        db.collection('sellQueries')
+          .where('sellerId', '==', user.uid)
+          .orderBy('submittedAt', 'desc')
+          .onSnapshot((snapshot) => {
+            activityListContainer.innerHTML = ''; // Clear loading text
+            let hasUnread = false;
+
+            if (snapshot.empty) {
+              activityListContainer.innerHTML = '<p class="text-center text-gray-500 py-8">You haven\'t listed any panels yet.</p>';
+              return;
+            }
+
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              const docId = doc.id;
+
+              // Check if admin left a message that the user hasn't seen
+              if (data.hasUnreadNotification) {
+                hasUnread = true;
+              }
+
+              // Determine status color and text
+              let statusBadge = `<span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Pending Review</span>`;
+              if (data.status === 'approved') statusBadge = `<span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Live on Market</span>`;
+              if (data.status === 'rejected') statusBadge = `<span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Rejected / Delisted</span>`;
+              if (data.status === 'sold') statusBadge = `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Sold!</span>`;
+
+              // Build the Admin Message Box (if it exists)
+              const adminMessageBox = data.adminMessage
+                ? `<div class="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 text-sm text-blue-800">
+                   <strong>Admin Note:</strong> ${data.adminMessage}
+                 </div>`
+                : '';
+
+              // Build the Card
+              const card = document.createElement('div');
+              card.className = "border rounded-lg p-4 shadow-sm relative";
+              card.innerHTML = `
+              <div class="flex justify-between items-start mb-2">
+                <div>
+                  <h4 class="font-bold text-lg">${data.panelParams}</h4>
+                  <p class="text-gray-600 text-sm">Listed Price: ₹<span id="price-display-${docId}">${data.price}</span></p>
+                </div>
+                ${statusBadge}
+              </div>
+              
+              ${adminMessageBox}
+
+              <div class="mt-4 flex gap-2 justify-end">
+                ${data.status === 'pending' || data.status === 'approved' ? `
+                  <button onclick="editUserPanelPrice('${docId}', ${data.price})" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded border">Edit Price</button>
+                  <button onclick="deleteUserPanel('${docId}')" class="text-sm bg-red-50 hover:bg-red-100 text-red-600 py-1 px-3 rounded border border-red-200">Remove Listing</button>
+                ` : ''}
+              </div>
+            `;
+              activityListContainer.appendChild(card);
+            });
+
+            // Show/Hide the Red Dot
+            if (hasUnread) {
+              notificationBadge.classList.remove('hidden');
+            } else {
+              notificationBadge.classList.add('hidden');
+            }
+          });
+
+        // Open Modal and Clear "Unread" status when clicked
+        activityBellBtn.addEventListener('click', () => {
+          activityModal.classList.remove('hidden');
+          activityModal.classList.add('flex');
+
+          // Mark all as read in Firestore
+          db.collection('sellQueries').where('sellerId', '==', user.uid).where('hasUnreadNotification', '==', true).get().then(snapshot => {
+            snapshot.forEach(doc => {
+              db.collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
+            });
+          });
+        });
+
+      } else {
+        // Hide if logged out
+        if (activityBellBtn) activityBellBtn.classList.add('hidden');
+      }
     });
 
     function clearRecaptcha() {
@@ -812,4 +906,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initialize preview if values are prefilled
   updateSellerPreview();
+  // --- GLOBAL FUNCTIONS FOR MY ACTIVITY ---
+  window.editUserPanelPrice = async function (docId, currentPrice) {
+    const newPrice = prompt(`Enter new price (Current: ₹${currentPrice}):`, currentPrice);
+
+    if (newPrice && !isNaN(newPrice) && newPrice !== currentPrice.toString()) {
+      try {
+        await db.collection('sellQueries').doc(docId).update({
+          price: parseFloat(newPrice)
+        });
+        alert("Price updated successfully!");
+      } catch (error) {
+        console.error("Error updating price:", error);
+        alert("Failed to update price.");
+      }
+    }
+  };
+
+  window.deleteUserPanel = async function (docId) {
+    if (confirm("Are you sure you want to remove this listing permanently?")) {
+      try {
+        await db.collection('sellQueries').doc(docId).delete();
+        alert("Listing removed.");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("Failed to remove listing.");
+      }
+    }
+  };
 });

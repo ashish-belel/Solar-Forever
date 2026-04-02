@@ -650,6 +650,34 @@
       </div>
     </div>
   </div>
+  <button id="activity-bell-btn"
+    class="hidden fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-transform z-50 flex items-center justify-center">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <span id="notification-badge"
+      class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">New</span>
+  </button>
+
+  <div id="activityModal"
+    class="modal-backdrop fixed inset-0 z-[100] hidden bg-black bg-opacity-50 items-center justify-center p-4">
+    <div class="modal-content relative bg-white w-full rounded-lg shadow-xl"
+      style="max-width: 600px; max-height: 90vh; overflow: hidden;">
+
+      <div class="flex justify-between items-center p-4 border-b">
+        <h3 class="text-xl font-bold">My Activity & Listings</h3>
+        <button
+          onclick="document.getElementById('activityModal').classList.add('hidden'); document.getElementById('activityModal').classList.remove('flex');"
+          class="text-2xl font-bold hover:text-gray-700">&times;</button>
+      </div>
+
+      <div id="activity-list-container" class="p-4 space-y-4" style="overflow-y: auto; max-height: 75vh;">
+        <p class="text-center text-gray-500 py-8">Loading your activity...</p>
+      </div>
+
+    </div>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
