@@ -468,15 +468,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sellBtn && buyOrSellModal) {
       sellBtn.addEventListener('click', () => {
-        if (currentUser) {
-          closeModal(buyOrSellModal);
-          openModal('sellPanelModal');
-        } else {
-          alert("Please log in or sign up to sell panels.");
-          closeModal(buyOrSellModal);
-          openModal('authModal');
-          resetAuthForms();
-        }
+        // close the "buyOrSell" selector if you have a helper
+        if (typeof closeModal === 'function') closeModal(buyOrSellModal);
+
+        resetSellModal(); // <-- ADD THIS LINE
+
+        const sellModal = document.getElementById('sellPanelModal');
+        if (sellModal) sellModal.classList.remove('hidden');
       });
     }
 
@@ -565,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
             panelImageURL: panelImageUrl,
             receiptImageURL: receiptImageUrl,
             status: 'pending', // Waiting for Admin Approval
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
           // 5. SUCCESS UI: Hide form and show success message
@@ -579,6 +577,27 @@ document.addEventListener('DOMContentLoaded', () => {
           submitBtn.textContent = 'Submit for Review';
         }
       });
+    }
+
+    // --- Function to reset the Sell Modal UI ---
+    function resetSellModal() {
+      const form = document.getElementById('sell-form');
+      const success = document.getElementById('sell-success');
+      const preview = document.getElementById('seller-live-preview');
+
+      if (form && success) {
+        form.classList.remove('hidden'); // Show the form again
+        success.classList.add('hidden'); // Hide the green checkmark
+        form.reset();                    // Clear all text inputs/files
+        if (preview) preview.classList.add('hidden'); // Hide the live preview box
+
+        // Re-enable the submit button
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit for Review';
+        }
+      }
     }
 
     // --- Buy Request Form Submission ---
