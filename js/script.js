@@ -502,62 +502,81 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Sell Panel Form Submission ---
+    // --- Updated Sell Form Submission Handler ---
     const sellForm = document.getElementById('sell-form');
     if (sellForm) {
       sellForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!currentUser) {
-          alert('Please sign in before submitting!');
-          openModal(authModal);
+
+        // 1. Check if user is logged in
+        if (!auth.currentUser) {
+          alert("Please login to list your panel.");
           return;
         }
 
-        const purchaseDate = sellForm.querySelector('input[type="date"]').value;
-        const purchasedFrom = sellForm.querySelector('input[name="purchased-from"]').value;
-        const panelParams = sellForm.querySelector('input[name="panel-params"]').value;
-        const panelType = document.getElementById('sell-panel-type').value;
-        const wattage = document.getElementById('sell-wattage').value;
-        const brand = document.getElementById('sell-brand').value;
-        const expectedPrice = document.getElementById('sell-price').value;//newly added
-        const loadType = document.getElementById('sell-load-type').value;
-        const sellReceiptFile = document.getElementById('sell-receipt').files[0];
-        const sellImageFile = document.getElementById('sell-image').files[0];
-
-        let receiptImageURL = '';
-        let panelImageURL = '';
-        const storageRef = storage.ref(); // Use initialized storage
+        const submitBtn = sellForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
 
         try {
-          if (sellImageFile) {
-            const imgSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-panel`).put(sellImageFile);
-            panelImageURL = await imgSnap.ref.getDownloadURL();
+          // 2. Get values from the NEW fields
+          const purchaseDate = sellForm.elements['purchase-date'].value;
+          const purchasedFrom = sellForm.elements['purchased-from'].value;
+          const price = document.getElementById('sell-price').value;
+          const loadType = document.getElementById('sell-load-type').value;
+
+          // New Separate Fields
+          const panelType = document.getElementById('sell-panel-type').value;
+          const wattage = document.getElementById('sell-wattage').value;
+          const brand = document.getElementById('sell-brand').value;
+
+          // Construct the display string for the Marketplace Title
+          const displayParams = `${wattage}W ${panelType}${brand ? ' (' + brand + ')' : ''}`;
+
+          // 3. Handle File Uploads
+          const imageFile = document.getElementById('sell-image').files[0];
+          const receiptFile = document.getElementById('sell-receipt').files[0];
+
+          let panelImageUrl = "";
+          let receiptImageUrl = "";
+
+          if (imageFile) {
+            const imgRef = storage.ref(`panels/${Date.now()}_${imageFile.name}`);
+            await imgRef.put(imageFile);
+            panelImageUrl = await imgRef.getDownloadURL();
           }
 
-          if (sellReceiptFile) {
-            const receiptSnap = await storageRef.child(`sellQueries/${currentUser.uid}/${Date.now()}-receipt`).put(sellReceiptFile);
-            receiptImageURL = await receiptSnap.ref.getDownloadURL();
+          if (receiptFile) {
+            const recRef = storage.ref(`receipts/${Date.now()}_${receiptFile.name}`);
+            await recRef.put(receiptFile);
+            receiptImageUrl = await recRef.getDownloadURL();
           }
 
+          // 4. Save to Firestore
           await db.collection('sellQueries').add({
-            sellerID: currentUser.uid,
-            sellerPhone: currentUser.phoneNumber || 'N/A',
+            sellerId: auth.currentUser.uid,
+            sellerPhone: auth.currentUser.phoneNumber,
             purchaseDate: purchaseDate,
             purchasedFrom: purchasedFrom,
-            panelParams: `${wattage}W ${panelType} (${brand})`, // We combine them for the title
-            actualWattage: parseInt(wattage), // We save the pure number for math
-            price: document.getElementById('sell-price').value,
-            loadType: document.getElementById('sell-load-type').value, panelImageURL: panelImageURL,
-            receiptImageURL: receiptImageURL,
-            status: 'pending',
-            submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            panelParams: displayParams, // Used for the title
+            actualWattage: parseInt(wattage), // Used for the calculator
+            price: parseFloat(price),
+            loadType: loadType,
+            panelImageURL: panelImageUrl,
+            receiptImageURL: receiptImageUrl,
+            status: 'pending', // Waiting for Admin Approval
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-          alert('Sell request submitted successfully!');
-          sellForm.reset();
-          closeModal(document.getElementById('sellPanelModal'));
+          // 5. SUCCESS UI: Hide form and show success message
+          sellForm.classList.add('hidden');
+          document.getElementById('sell-success').classList.remove('hidden');
+
         } catch (error) {
-          alert('Error submitting request.');
-          console.error(error);
+          console.error("Submission error:", error);
+          alert("Error submitting: " + error.message);
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit for Review';
         }
       });
     }
