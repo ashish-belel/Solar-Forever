@@ -466,15 +466,15 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (sellBtn && buyOrSellModal) {
+    // Updated Sell Button Listener
+    if (sellBtn) {
       sellBtn.addEventListener('click', () => {
-        // close the "buyOrSell" selector if you have a helper
-        if (typeof closeModal === 'function') closeModal(buyOrSellModal);
-
-        resetSellModal(); // <-- ADD THIS LINE
-
-        const sellModal = document.getElementById('sellPanelModal');
-        if (sellModal) sellModal.classList.remove('hidden');
+        resetSellModal(); // Clean the form first
+        const modal = document.getElementById('sellPanelModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex'); // Add flex for centering
+        }
       });
     }
 
@@ -580,24 +580,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Function to reset the Sell Modal UI ---
+    // --- Function to reset the Sell Modal UI ---
     function resetSellModal() {
       const form = document.getElementById('sell-form');
       const success = document.getElementById('sell-success');
       const preview = document.getElementById('seller-live-preview');
 
-      if (form && success) {
-        form.classList.remove('hidden'); // Show the form again
-        success.classList.add('hidden'); // Hide the green checkmark
-        form.reset();                    // Clear all text inputs/files
-        if (preview) preview.classList.add('hidden'); // Hide the live preview box
-
-        // Re-enable the submit button
+      if (form) {
+        form.classList.remove('hidden');
+        form.reset();
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit for Review';
         }
       }
+      if (success) success.classList.add('hidden');
+      if (preview) preview.classList.add('hidden');
     }
 
     // --- Buy Request Form Submission ---
