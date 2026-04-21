@@ -934,19 +934,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
-  
+
   // --- BULLETPROOF BELL ICON LISTENER ---
   const myBellBtn = document.getElementById('activity-bell-btn');
   const myActivityModal = document.getElementById('activityModal');
 
   if (myBellBtn && myActivityModal) {
     myBellBtn.addEventListener('click', () => {
-      console.log("Activity bell clicked!");
-
-      // 1. Open the modal
+      console.log("Activity bell clicked! Forcing modal open..."); 
+      
+      // 1. Force the Modal Open (Bypassing Tailwind conflicts)
       myActivityModal.classList.remove('hidden');
       myActivityModal.classList.add('flex');
-
+      myActivityModal.style.display = 'flex'; // Force display
+      myActivityModal.style.opacity = '1';    // Force visibility
+      myActivityModal.style.visibility = 'visible';
+      myActivityModal.style.zIndex = '99999'; // Force it to the absolute front
+      
       // 2. Clear the red dot
       const badge = document.getElementById('notification-badge');
       if (badge) badge.classList.add('hidden');
@@ -954,19 +958,28 @@ document.addEventListener('DOMContentLoaded', () => {
       // 3. Tell Firebase to mark messages as read
       const currentUser = firebase.auth().currentUser;
       if (currentUser) {
-        // FIXED: Using firebase.firestore() directly instead of 'db'
         firebase.firestore().collection('sellQueries')
           .where('sellerId', '==', currentUser.uid)
           .where('hasUnreadNotification', '==', true)
           .get()
           .then(snapshot => {
             snapshot.forEach(doc => {
-              // FIXED: Using firebase.firestore() here too
               firebase.firestore().collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
             });
           })
           .catch(err => console.error("Error clearing notifications:", err));
       }
     });
+
+    // --- MISSING CLOSE BUTTON LOGIC ---
+    // Let's also make sure you can close it once it opens!
+    const closeActivityBtn = myActivityModal.querySelector('button');
+    if (closeActivityBtn) {
+      closeActivityBtn.addEventListener('click', () => {
+        myActivityModal.classList.add('hidden');
+        myActivityModal.classList.remove('flex');
+        myActivityModal.style.display = 'none'; // Force hide
+      });
+    }
   }
 });
