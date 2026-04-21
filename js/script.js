@@ -934,32 +934,35 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
+  
   // --- BULLETPROOF BELL ICON LISTENER ---
   const myBellBtn = document.getElementById('activity-bell-btn');
   const myActivityModal = document.getElementById('activityModal');
 
   if (myBellBtn && myActivityModal) {
     myBellBtn.addEventListener('click', () => {
-      console.log("Activity bell clicked!"); // To help us verify it works
+      console.log("Activity bell clicked!");
 
-      // 1. Open the modal (Toggle Tailwind classes)
+      // 1. Open the modal
       myActivityModal.classList.remove('hidden');
       myActivityModal.classList.add('flex');
 
-      // 2. Clear the red dot immediately on the UI
+      // 2. Clear the red dot
       const badge = document.getElementById('notification-badge');
       if (badge) badge.classList.add('hidden');
 
-      // 3. Tell Firebase to mark messages as read (if user is logged in)
+      // 3. Tell Firebase to mark messages as read
       const currentUser = firebase.auth().currentUser;
       if (currentUser) {
-        db.collection('sellQueries')
+        // FIXED: Using firebase.firestore() directly instead of 'db'
+        firebase.firestore().collection('sellQueries')
           .where('sellerId', '==', currentUser.uid)
           .where('hasUnreadNotification', '==', true)
           .get()
           .then(snapshot => {
             snapshot.forEach(doc => {
-              db.collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
+              // FIXED: Using firebase.firestore() here too
+              firebase.firestore().collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
             });
           })
           .catch(err => console.error("Error clearing notifications:", err));
