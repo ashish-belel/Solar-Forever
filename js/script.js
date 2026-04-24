@@ -747,13 +747,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!currentUser) {
           console.log('User not logged in, showing auth modal');
-          openModal(document.getElementById('authModal'));
+          openModal('authModal');
           resetAuthForms();
         } else {
           console.log('User logged in, opening activity modal');
           if (myActivityModal) {
-            myActivityModal.classList.remove('hidden');
-            myActivityModal.classList.add('flex');
+            myActivityModal.classList.add('active');
+            myActivityModal.classList.add('modal-open');
           }
 
           const badge = document.getElementById('notification-badge');
@@ -775,8 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (closeActivityBtn && myActivityModal) {
       closeActivityBtn.addEventListener('click', () => {
-        myActivityModal.classList.add('hidden');
-        myActivityModal.classList.remove('flex');
+        myActivityModal.classList.remove('active');
+        myActivityModal.classList.remove('modal-open');
       });
     }
 
