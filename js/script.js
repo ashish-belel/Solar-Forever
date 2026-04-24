@@ -666,22 +666,113 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("User is signed out.");
         if (loginBtnDesktop) loginBtnDesktop.textContent = 'Sign In / Sign Up';
       }
-      // --- MY ACTIVITY & NOTIFICATIONS LOGIC ---
+
+      // // --- MY ACTIVITY & NOTIFICATIONS LOGIC ---
+      // const activityBellBtn = document.getElementById('activity-bell-btn');
+      // const notificationBadge = document.getElementById('notification-badge');
+      // const activityModal = document.getElementById('activityModal');
+      // const activityListContainer = document.getElementById('activity-list-container');
+      // const closeActBtn = document.getElementById('closeActivityModal');
+
+      // if (user) {
+      //   // Show the floating bell since they are logged in
+      //   if (activityBellBtn) activityBellBtn.classList.remove('hidden');
+
+      //   // Listen to this specific user's listings
+      //   db.collection('sellQueries')
+      //     .where('sellerId', '==', user.uid)
+      //     .orderBy('submittedAt', 'desc')
+      //     .onSnapshot((snapshot) => {
+      //       activityListContainer.innerHTML = ''; // Clear loading text
+      //       let hasUnread = false;
+
+      //       if (snapshot.empty) {
+      //         activityListContainer.innerHTML = '<p class="text-center text-gray-500 py-8">You haven\'t listed any panels yet.</p>';
+      //         return;
+      //       }
+
+      //       snapshot.forEach((doc) => {
+      //         const data = doc.data();
+      //         const docId = doc.id;
+
+      //         // Check if admin left a message that the user hasn't seen
+      //         if (data.hasUnreadNotification) {
+      //           hasUnread = true;
+      //         }
+
+      //         // Determine status color and text
+      //         let statusBadge = `<span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Pending Review</span>`;
+      //         if (data.status === 'approved') statusBadge = `<span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Live on Market</span>`;
+      //         if (data.status === 'rejected') statusBadge = `<span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Rejected / Delisted</span>`;
+      //         if (data.status === 'sold') statusBadge = `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Sold!</span>`;
+
+      //         // Build the Admin Message Box (if it exists)
+      //         const adminMessageBox = data.adminMessage
+      //           ? `<div class="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 text-sm text-blue-800">
+      //              <strong>Admin Note:</strong> ${data.adminMessage}
+      //            </div>`
+      //           : '';
+
+      //         // Build the Card
+      //         const card = document.createElement('div');
+      //         card.className = "border rounded-lg p-4 shadow-sm relative";
+      //         card.innerHTML = `
+      //         <div class="flex justify-between items-start mb-2">
+      //           <div>
+      //             <h4 class="font-bold text-lg">${data.panelParams}</h4>
+      //             <p class="text-gray-600 text-sm">Listed Price: ₹<span id="price-display-${docId}">${data.price}</span></p>
+      //           </div>
+      //           ${statusBadge}
+      //         </div>
+
+      //         ${adminMessageBox}
+
+      //         <div class="mt-4 flex gap-2 justify-end">
+      //           ${data.status === 'pending' || data.status === 'approved' ? `
+      //             <button onclick="editUserPanelPrice('${docId}', ${data.price})" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded border">Edit Price</button>
+      //             <button onclick="deleteUserPanel('${docId}')" class="text-sm bg-red-50 hover:bg-red-100 text-red-600 py-1 px-3 rounded border border-red-200">Remove Listing</button>
+      //           ` : ''}
+      //         </div>
+      //       `;
+      //         activityListContainer.appendChild(card);
+      //       });
+
+      //       // Show/Hide the Red Dot
+      //       if (hasUnread) {
+      //         notificationBadge.classList.remove('hidden');
+      //       } else {
+      //         notificationBadge.classList.add('hidden');
+      //       }
+      //     });
+      // }
+      // // Open Modal and Clear "Unread" status when clicked
+      // activityBellBtn.addEventListener('click', () => {
+      //   activityModal.classList.remove('hidden');
+      //   activityModal.classList.add('flex');
+
+      //   // Mark all as read in Firestore
+      //   db.collection('sellQueries').where('sellerId', '==', user.uid).where('hasUnreadNotification', '==', true).get().then(snapshot => {
+      //     snapshot.forEach(doc => {
+      //       db.collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
+      //     });
+      //   });
+      // });
+
+      // --- MY ACTIVITY DATA LOADER ---
       const activityBellBtn = document.getElementById('activity-bell-btn');
       const notificationBadge = document.getElementById('notification-badge');
-      const activityModal = document.getElementById('activityModal');
       const activityListContainer = document.getElementById('activity-list-container');
 
       if (user) {
-        // Show the floating bell since they are logged in
+        // Show the bell icon
         if (activityBellBtn) activityBellBtn.classList.remove('hidden');
 
-        // Listen to this specific user's listings
+        // Listen for data changes
         db.collection('sellQueries')
           .where('sellerId', '==', user.uid)
           .orderBy('submittedAt', 'desc')
           .onSnapshot((snapshot) => {
-            activityListContainer.innerHTML = ''; // Clear loading text
+            activityListContainer.innerHTML = '';
             let hasUnread = false;
 
             if (snapshot.empty) {
@@ -692,71 +783,42 @@ document.addEventListener('DOMContentLoaded', () => {
             snapshot.forEach((doc) => {
               const data = doc.data();
               const docId = doc.id;
+              if (data.hasUnreadNotification) hasUnread = true;
 
-              // Check if admin left a message that the user hasn't seen
-              if (data.hasUnreadNotification) {
-                hasUnread = true;
-              }
-
-              // Determine status color and text
               let statusBadge = `<span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">Pending Review</span>`;
               if (data.status === 'approved') statusBadge = `<span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Live on Market</span>`;
-              if (data.status === 'rejected') statusBadge = `<span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Rejected / Delisted</span>`;
+              if (data.status === 'rejected') statusBadge = `<span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">Rejected</span>`;
               if (data.status === 'sold') statusBadge = `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">Sold!</span>`;
 
-              // Build the Admin Message Box (if it exists)
               const adminMessageBox = data.adminMessage
-                ? `<div class="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 text-sm text-blue-800">
-                   <strong>Admin Note:</strong> ${data.adminMessage}
-                 </div>`
+                ? `<div class="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 text-sm text-blue-800"><strong>Admin Note:</strong> ${data.adminMessage}</div>`
                 : '';
 
-              // Build the Card
               const card = document.createElement('div');
-              card.className = "border rounded-lg p-4 shadow-sm relative";
+              card.className = "border rounded-lg p-4 shadow-sm bg-white";
               card.innerHTML = `
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <h4 class="font-bold text-lg">${data.panelParams}</h4>
-                  <p class="text-gray-600 text-sm">Listed Price: ₹<span id="price-display-${docId}">${data.price}</span></p>
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 class="font-bold text-lg text-gray-800">${data.panelParams}</h4>
+                    <p class="text-gray-600 text-sm">Listed Price: ₹${data.price}</p>
+                  </div>
+                  ${statusBadge}
                 </div>
-                ${statusBadge}
-              </div>
-              
-              ${adminMessageBox}
-
-              <div class="mt-4 flex gap-2 justify-end">
-                ${data.status === 'pending' || data.status === 'approved' ? `
-                  <button onclick="editUserPanelPrice('${docId}', ${data.price})" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded border">Edit Price</button>
-                  <button onclick="deleteUserPanel('${docId}')" class="text-sm bg-red-50 hover:bg-red-100 text-red-600 py-1 px-3 rounded border border-red-200">Remove Listing</button>
-                ` : ''}
-              </div>
-            `;
+                ${adminMessageBox}
+                <div class="mt-4 flex gap-2 justify-end">
+                  <button onclick="editUserPanelPrice('${docId}', ${data.price})" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-800 py-1.5 px-3 rounded border transition-colors">Edit Price</button>
+                  <button onclick="deleteUserPanel('${docId}')" class="text-sm bg-red-50 hover:bg-red-100 text-red-600 py-1.5 px-3 rounded border border-red-100 transition-colors">Remove</button>
+                </div>
+              `;
               activityListContainer.appendChild(card);
             });
 
-            // Show/Hide the Red Dot
-            if (hasUnread) {
-              notificationBadge.classList.remove('hidden');
-            } else {
-              notificationBadge.classList.add('hidden');
-            }
+            // Update red dot badge
+            if (hasUnread) notificationBadge.classList.remove('hidden');
+            else notificationBadge.classList.add('hidden');
           });
-
-        // // Open Modal and Clear "Unread" status when clicked
-        // activityBellBtn.addEventListener('click', () => {
-        //   activityModal.classList.remove('hidden');
-        //   activityModal.classList.add('flex');
-
-        //   // Mark all as read in Firestore
-        //   db.collection('sellQueries').where('sellerId', '==', user.uid).where('hasUnreadNotification', '==', true).get().then(snapshot => {
-        //     snapshot.forEach(doc => {
-        //       db.collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
-        //     });
-        //   });
-        // });
-
-      } else {
+      }
+      else {
         // Hide if logged out
         if (activityBellBtn) activityBellBtn.classList.add('hidden');
       }
@@ -941,8 +1003,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (myBellBtn && myActivityModal) {
     myBellBtn.addEventListener('click', () => {
-      console.log("Activity bell clicked! Forcing modal open..."); 
-      
+      console.log("Activity bell clicked! Forcing modal open...");
+
       // 1. Force the Modal Open (Bypassing Tailwind conflicts)
       myActivityModal.classList.remove('hidden');
       myActivityModal.classList.add('flex');
@@ -950,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', () => {
       myActivityModal.style.opacity = '1';    // Force visibility
       myActivityModal.style.visibility = 'visible';
       myActivityModal.style.zIndex = '99999'; // Force it to the absolute front
-      
+
       // 2. Clear the red dot
       const badge = document.getElementById('notification-badge');
       if (badge) badge.classList.add('hidden');
@@ -983,3 +1045,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+// --- GLOBAL ACTIVITY MODAL CONTROLS ---
+const actBell = document.getElementById('activity-bell-btn');
+const actModal = document.getElementById('activityModal');
+const actClose = document.getElementById('closeActivityModal');
+
+function toggleActivityModal(show) {
+  if (!actModal) return;
+  if (show) {
+    actModal.classList.remove('hidden');
+    actModal.classList.add('flex');
+    document.body.style.overflow = 'hidden'; // Prevents background scroll
+  } else {
+    actModal.classList.add('hidden');
+    actModal.classList.remove('flex');
+    document.body.style.overflow = 'auto';   // Enables background scroll
+  }
+}
+
+// Open and clear notifications
+if (actBell) {
+  actBell.addEventListener('click', () => {
+    toggleActivityModal(true);
+    const user = firebase.auth().currentUser;
+    if (user) {
+      firebase.firestore().collection('sellQueries')
+        .where('sellerId', '==', user.uid)
+        .where('hasUnreadNotification', '==', true)
+        .get().then(snap => {
+          snap.forEach(doc => doc.ref.update({ hasUnreadNotification: false }));
+        });
+    }
+  });
+}
+
+// Close button
+if (actClose) {
+  actClose.addEventListener('click', () => {
+    console.log("Closing Activity Modal...");
+    toggleActivityModal(false); // This calls the function that handles hidden/flex AND overflow
+  });
+}
+
+// --- GLOBAL ACTIONS (EDIT & DELETE) ---
+window.editUserPanelPrice = async function (docId, currentPrice) {
+  const newPrice = prompt(`Enter new price for this listing:`, currentPrice);
+  if (newPrice && !isNaN(newPrice) && newPrice !== currentPrice.toString()) {
+    try {
+      await firebase.firestore().collection('sellQueries').doc(docId).update({
+        price: parseFloat(newPrice)
+      });
+      alert("Price successfully updated!");
+    } catch (err) {
+      console.error(err);
+      alert("Could not update price.");
+    }
+  }
+};
+
+window.deleteUserPanel = async function (docId) {
+  if (confirm("Are you sure you want to permanently remove this listing?")) {
+    try {
+      await firebase.firestore().collection('sellQueries').doc(docId).delete();
+      alert("Listing removed.");
+    } catch (err) {
+      console.error(err);
+      alert("Error removing listing.");
+    }
+  }
+};
