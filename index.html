@@ -650,6 +650,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Activity Bell Button -->
   <button id="activity-bell-btn"
     class="hidden fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-2xl hover:bg-blue-700 hover:scale-110 transition-transform z-50 flex items-center justify-center">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -660,17 +662,31 @@
       class="hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">New</span>
   </button>
 
-  <div id="activityModal"
+  <!-- Replace the entire activityModal div with this -->
+  <div id="activityModal" class="modal-backdrop">
+    <div class="modal-content relative bg-white rounded-lg shadow-xl"
+      style="max-width: 600px; max-height: 80vh; overflow: hidden;">
+      <div class="flex justify-between items-center p-4 border-b bg-white sticky top-0 z-10">
+        <h3 class="text-xl font-bold text-gray-800">My Activity & Listings</h3>
+        <button id="closeActivityModal"
+          class="text-3xl font-bold hover:text-gray-700 transition-colors">&times;</button>
+      </div>
+      <div id="activity-list-container" class="p-4 space-y-4" style="overflow-y: auto; max-height: calc(80vh - 80px);">
+        <p class="text-center text-gray-500 py-8">Loading your activity...</p>
+      </div>
+    </div>
+  </div>
+  <!-- <div id="activityModal"
     class="modal modal-backdrop fixed inset-0 z-[100] hidden bg-black bg-opacity-50 items-center justify-center p-4 overflow-y-auto">
     <div class="modal-content relative bg-white w-full rounded-lg shadow-xl z-[101] my-auto"
       style="max-width: 600px; max-height: 90vh; overflow: hidden;">
 
       <div class="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-lg z-10">
         <h3 class="text-xl font-bold text-gray-800">My Activity & Listings</h3>
-        <!--<button id="closeActivityModal"
+        <button id="closeActivityModal"
           onclick="document.getElementById('activityModal').classList.add('hidden'); document.getElementById('activityModal').classList.remove('flex');"
-          class="text-2xl font-bold hover:text-gray-700">&times;</button>-->
-          <button id="closeActivityModal" class="text-3xl font-bold hover:text-gray-700 transition-colors">&times;</button>
+          class="text-2xl font-bold hover:text-gray-700">&times;</button>
+          //<button id="closeActivityModal" class="text-3xl font-bold hover:text-gray-700 transition-colors">&times;</button>
       </div>
 
       <div id="activity-list-container" class="p-4 space-y-4" style="overflow-y: auto; max-height: 75vh;">
@@ -678,7 +694,7 @@
       </div>
 
     </div>
-  </div>
+  </div> -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>

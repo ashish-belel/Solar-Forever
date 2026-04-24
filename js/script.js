@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
       //         return;
       //       }
 
-      //       snapshot.forEach((doc) => {
+      //       snapshot.forEach(doc => {
       //         const data = doc.data();
       //         const docId = doc.id;
 
@@ -974,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (newPrice && !isNaN(newPrice) && newPrice !== currentPrice.toString()) {
       try {
-        await db.collection('sellQueries').doc(docId).update({
+        await firebase.firestore().collection('sellQueries').doc(docId).update({
           price: parseFloat(newPrice)
         });
         alert("Price updated successfully!");
@@ -988,7 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.deleteUserPanel = async function (docId) {
     if (confirm("Are you sure you want to remove this listing permanently?")) {
       try {
-        await db.collection('sellQueries').doc(docId).delete();
+        await firebase.firestore().collection('sellQueries').doc(docId).delete();
         alert("Listing removed.");
       } catch (error) {
         console.error("Error deleting:", error);
@@ -996,122 +996,32 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   };
+}); // <-- CLOSE THE MAIN DOMContentLoaded LISTENER
 
-  // --- BULLETPROOF BELL ICON LISTENER ---
-  const myBellBtn = document.getElementById('activity-bell-btn');
-  const myActivityModal = document.getElementById('activityModal');
-
-  if (myBellBtn && myActivityModal) {
-    myBellBtn.addEventListener('click', () => {
-      console.log("Activity bell clicked! Forcing modal open...");
-
-      // 1. Force the Modal Open (Bypassing Tailwind conflicts)
-      myActivityModal.classList.remove('hidden');
-      myActivityModal.classList.add('flex');
-      myActivityModal.style.display = 'flex'; // Force display
-      myActivityModal.style.opacity = '1';    // Force visibility
-      myActivityModal.style.visibility = 'visible';
-      myActivityModal.style.zIndex = '99999'; // Force it to the absolute front
-
-      // 2. Clear the red dot
-      const badge = document.getElementById('notification-badge');
-      if (badge) badge.classList.add('hidden');
-
-      // 3. Tell Firebase to mark messages as read
-      const currentUser = firebase.auth().currentUser;
-      if (currentUser) {
-        firebase.firestore().collection('sellQueries')
-          .where('sellerId', '==', currentUser.uid)
-          .where('hasUnreadNotification', '==', true)
-          .get()
-          .then(snapshot => {
-            snapshot.forEach(doc => {
-              firebase.firestore().collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
-            });
-          })
-          .catch(err => console.error("Error clearing notifications:", err));
-      }
-    });
-
-    // --- MISSING CLOSE BUTTON LOGIC ---
-    // Let's also make sure you can close it once it opens!
-    const closeActivityBtn = myActivityModal.querySelector('button');
-    if (closeActivityBtn) {
-      closeActivityBtn.addEventListener('click', () => {
-        myActivityModal.classList.add('hidden');
-        myActivityModal.classList.remove('flex');
-        myActivityModal.style.display = 'none'; // Force hide
-      });
-    }
-  }
-});
-
-// --- GLOBAL ACTIVITY MODAL CONTROLS ---
-const actBell = document.getElementById('activity-bell-btn');
-const actModal = document.getElementById('activityModal');
-const actClose = document.getElementById('closeActivityModal');
-
-function toggleActivityModal(show) {
-  if (!actModal) return;
-  if (show) {
-    actModal.classList.remove('hidden');
-    actModal.classList.add('flex');
-    document.body.style.overflow = 'hidden'; // Prevents background scroll
-  } else {
-    actModal.classList.add('hidden');
-    actModal.classList.remove('flex');
-    document.body.style.overflow = 'auto';   // Enables background scroll
-  }
-}
-
-// Open and clear notifications
-if (actBell) {
-  actBell.addEventListener('click', () => {
-    toggleActivityModal(true);
-    const user = firebase.auth().currentUser;
-    if (user) {
-      firebase.firestore().collection('sellQueries')
-        .where('sellerId', '==', user.uid)
-        .where('hasUnreadNotification', '==', true)
-        .get().then(snap => {
-          snap.forEach(doc => doc.ref.update({ hasUnreadNotification: false }));
-        });
-    }
-  });
-}
-
-// Close button
-if (actClose) {
-  actClose.addEventListener('click', () => {
-    console.log("Closing Activity Modal...");
-    toggleActivityModal(false); // This calls the function that handles hidden/flex AND overflow
-  });
-}
-
-// --- GLOBAL ACTIONS (EDIT & DELETE) ---
+// === GLOBAL FUNCTIONS (Outside DOMContentLoaded) ===
 window.editUserPanelPrice = async function (docId, currentPrice) {
-  const newPrice = prompt(`Enter new price for this listing:`, currentPrice);
+  const newPrice = prompt(`Enter new price (Current: ₹${currentPrice}):`, currentPrice);
   if (newPrice && !isNaN(newPrice) && newPrice !== currentPrice.toString()) {
     try {
       await firebase.firestore().collection('sellQueries').doc(docId).update({
         price: parseFloat(newPrice)
       });
-      alert("Price successfully updated!");
-    } catch (err) {
-      console.error(err);
-      alert("Could not update price.");
+      alert("Price updated successfully!");
+    } catch (error) {
+      console.error("Error updating price:", error);
+      alert("Failed to update price.");
     }
   }
 };
 
 window.deleteUserPanel = async function (docId) {
-  if (confirm("Are you sure you want to permanently remove this listing?")) {
+  if (confirm("Are you sure you want to remove this listing permanently?")) {
     try {
       await firebase.firestore().collection('sellQueries').doc(docId).delete();
       alert("Listing removed.");
-    } catch (err) {
-      console.error(err);
-      alert("Error removing listing.");
+    } catch (error) {
+      console.error("Error deleting:", error);
+      alert("Failed to remove listing.");
     }
   }
 };
