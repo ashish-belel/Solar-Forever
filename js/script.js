@@ -777,6 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (snapshot.empty) {
               activityListContainer.innerHTML = '<p class="text-center text-gray-500 py-8">You haven\'t listed any panels yet.</p>';
+              if (notificationBadge) notificationBadge.classList.add('hidden');
               return;
             }
 
@@ -814,15 +815,69 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Update red dot badge
-            if (hasUnread) notificationBadge.classList.remove('hidden');
-            else notificationBadge.classList.add('hidden');
+            if (notificationBadge) {
+              if (hasUnread) {
+                notificationBadge.classList.remove('hidden');
+              } else {
+                notificationBadge.classList.add('hidden');
+              }
+            }
           });
       }
       else {
         // Hide if logged out
         if (activityBellBtn) activityBellBtn.classList.add('hidden');
+        if (notificationBadge) notificationBadge.classList.add('hidden');
       }
     });
+
+    // --- ACTIVITY BELL: OPEN/CLOSE MODAL (OUTSIDE auth listener) ---
+    const myBellBtn = document.getElementById('activity-bell-btn');
+    const myActivityModal = document.getElementById('activityModal');
+    const closeActivityBtn = document.getElementById('closeActivityModal');
+    const notificationBadge = document.getElementById('notification-badge');
+
+    if (myBellBtn) {
+      myBellBtn.addEventListener('click', () => {
+        const currentUser = firebase.auth().currentUser;
+
+        if (!currentUser) {
+          // User NOT logged in: show sign in modal
+          console.log('User not logged in, showing auth modal');
+          openModal(document.getElementById('authModal'));
+          resetAuthForms();
+        } else {
+          // User IS logged in: open activity modal
+          console.log('User logged in, opening activity modal');
+          if (myActivityModal) {
+            myActivityModal.classList.remove('hidden');
+            myActivityModal.classList.add('flex');
+          }
+          // Clear red dot badge
+          if (notificationBadge) notificationBadge.classList.add('hidden');
+
+          // Mark all as read in Firestore
+          firebase.firestore().collection('sellQueries')
+            .where('sellerId', '==', currentUser.uid)
+            .where('hasUnreadNotification', '==', true)
+            .get()
+            .then(snapshot => {
+              snapshot.forEach(doc => {
+                firebase.firestore().collection('sellQueries').doc(doc.id).update({ hasUnreadNotification: false });
+              });
+            })
+            .catch(err => console.error('Error clearing notifications:', err));
+        }
+      });
+    }
+
+    // Close activity modal
+    if (closeActivityBtn && myActivityModal) {
+      closeActivityBtn.addEventListener('click', () => {
+        myActivityModal.classList.add('hidden');
+        myActivityModal.classList.remove('flex');
+      });
+    }
 
     function clearRecaptcha() {
       if (window.recaptchaVerifier) {
